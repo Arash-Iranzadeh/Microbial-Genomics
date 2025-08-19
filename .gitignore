@@ -1,0 +1,16 @@
+bacterial_genomics/
+*.fastq
+*.fastq.gz
+*.fq.gz
+*.bam
+*.sam
+*.vcf
+*.gz
+*.zip
+*.tar
+*.tar.gz
+enaBrowserTools/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
