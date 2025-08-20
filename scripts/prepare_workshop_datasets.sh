@@ -13,8 +13,8 @@ set -euo pipefail
 # ==============================================================================
 
 BASE="${PWD}/bacterial_genomics"   # <— use current directory
-TB_DIR="${BASE}/tb"
-VC_DIR="${BASE}/vc"
+TB_DIR="${BASE}/tb/short_reads"
+VC_DIR="${BASE}/vc/short_reads"
 THREADS_ENA=4
 DS_SEED=100
 TB_GENOME_SIZE=4400000
