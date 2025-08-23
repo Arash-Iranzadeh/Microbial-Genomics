@@ -12,7 +12,9 @@ This repository contains teaching materials for the **Microbial Genomics and Met
 git clone https://github.com/Arash-Iranzadeh/Microbial-Genomics.git
 
 cd Microbial-Genomics.git
+
 ./scripts/prepare_tb.sh
+
 ./scripts/prepare_vc.sh
 
 
