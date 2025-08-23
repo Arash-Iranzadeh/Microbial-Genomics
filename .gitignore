@@ -1,16 +1,39 @@
-bacterial_genomics/
-*.fastq
-*.fastq.gz
-*.fq.gz
-*.bam
-*.sam
-*.vcf
-*.gz
-*.zip
-*.tar
-*.tar.gz
-enaBrowserTools/
+# --- Raw data & heavy outputs (never commit these) ---
+# Raw FASTQs (and common extensions)
+**/*.fastq
+**/*.fastq.gz
+**/*.fq.gz
+
+# Alignments & variant files
+**/*.bam
+**/*.cram
+**/*.sam
+**/*.bai
+**/*.vcf
+**/*.vcf.gz
+**/*.bcf
+**/*.crai
+**/*.tbi
+**/*.csi
+**/*.fai
+
+# Kraken2 heavy outputs (per-read classifications)
+**/*.kraken
+**/*.kreport
+
+# FastQC/MultiQC heavy artifacts (keep examples under results/ only)
+**/*_fastqc.html
+**/*_fastqc.zip
+multiqc_report.html
+
+# Do not track local "workshop" working dirs if used
+workshop/
+data/**/raw_data/
+
+# OS cruft
 .DS_Store
 Thumbs.db
-*.swp
-*.swo
+
+# Python / notebooks (if added later)
+__pycache__/
+.ipynb_checkpoints/
