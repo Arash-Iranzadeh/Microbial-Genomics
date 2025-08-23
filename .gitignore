@@ -1,39 +1,26 @@
-# --- Raw data & heavy outputs (never commit these) ---
-# Raw FASTQs (and common extensions)
+# Raw data
 **/*.fastq
 **/*.fastq.gz
 **/*.fq.gz
 
-# Alignments & variant files
+# Large downstream files
 **/*.bam
-**/*.cram
 **/*.sam
-**/*.bai
-**/*.vcf
-**/*.vcf.gz
+**/*.cram
+**/*.vcf*
 **/*.bcf
-**/*.crai
-**/*.tbi
-**/*.csi
-**/*.fai
 
-# Kraken2 heavy outputs (per-read classifications)
-**/*.kraken
-**/*.kreport
-
-# FastQC/MultiQC heavy artifacts (keep examples under results/ only)
+# QC artifacts (keep only curated examples under results/)
 **/*_fastqc.html
 **/*_fastqc.zip
 multiqc_report.html
+**/*.kraken
+**/*.kreport
 
-# Do not track local "workshop" working dirs if used
+# Working dirs
 workshop/
 data/**/raw_data/
 
-# OS cruft
+# Misc
 .DS_Store
 Thumbs.db
-
-# Python / notebooks (if added later)
-__pycache__/
-.ipynb_checkpoints/
