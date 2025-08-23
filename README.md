@@ -1,4 +1,18 @@
-# 1) Dataset preparation
-To fetch balanced datasets of **Mycobacterium tuberculosis** and **Vibrio cholerae** from ENA use prepare_workshop_datasets.sh from script. It creates the dataset directory including sequencing data and metadata.
-### Run:
-MAX_DOWNLOAD_MB=1000 DOWNLOAD_FASTQS=true ./prepare_workshop_datasets.sh
+# Microbial Genomics Workshop Materials
+
+This repository contains teaching materials for the **Microbial Genomics and Metagenomics for Clinical and Public Health Applications** workshop (UCT, Sept 2025):contentReference[oaicite:1]{index=1}.
+
+## Structure
+- `data/` – metadata and download scripts (TB and VC datasets)
+- `scripts/` – pipelines for each session
+- `results/` – representative outputs (FastQC, MultiQC, Kraken2)
+- `docs/` – slides, tutorials, and images
+
+### Prepare data:
+git clone https://github.com/Arash-Iranzadeh/Microbial-Genomics.git
+cd Microbial-Genomics.git
+./scripts/prepare_tb.sh
+./scripts/prepare_vc.sh
+
+
+
