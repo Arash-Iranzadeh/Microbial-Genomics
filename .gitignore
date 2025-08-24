@@ -24,3 +24,6 @@ data/**/raw_data/
 # Misc
 .DS_Store
 Thumbs.db
+data/*/raw_data/**
+!data/*/raw_data/
+!data/*/raw_data/*.md
