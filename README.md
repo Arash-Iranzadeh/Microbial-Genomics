@@ -8,14 +8,17 @@ This repository contains teaching materials for the **Microbial Genomics and Met
 - `results/` – representative outputs (FastQC, MultiQC, Kraken2)
 - `docs/` – slides, tutorials, and images
 
-### Prepare data:
+### Clone repository:
 git clone https://github.com/Arash-Iranzadeh/Microbial-Genomics.git
 
-cd Microbial-Genomics.git
+### Download data:
+ cd Microbial-Genomics/
+ cd path/to/Microbial-Genomics/data/tb/metadata/; ./tb_download.sh
+ cd path/to/Microbial-Genomics/data/vc/metadata/; ./vc_download.sh
 
-./scripts/prepare_tb.sh
+ 
 
-./scripts/prepare_vc.sh
+
 
 
 
