@@ -9,7 +9,7 @@ This repository contains teaching materials for the **Microbial Genomics and Met
 - `docs/` – slides, tutorials, and images
 
 ### Clone repository:
-git clone https://github.com/Arash-Iranzadeh/Microbial-Genomics.git
+- git clone https://github.com/Arash-Iranzadeh/Microbial-Genomics.git
 
 ### Download data:
  - cd Microbial-Genomics/
