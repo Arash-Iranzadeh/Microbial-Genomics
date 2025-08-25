@@ -1,29 +1,9 @@
-# Raw data
-**/*.fastq
-**/*.fastq.gz
-**/*.fq.gz
+# Ignore everything in raw_data and results
+data/*/raw_data/*
+results/*
 
-# Large downstream files
-**/*.bam
-**/*.sam
-**/*.cram
-**/*.vcf*
-**/*.bcf
-
-# QC artifacts (keep only curated examples under results/)
-**/*_fastqc.html
-**/*_fastqc.zip
-multiqc_report.html
-**/*.kraken
-**/*.kreport
-
-# Working dirs
-workshop/
-data/**/raw_data/
-
-# Misc
-.DS_Store
-Thumbs.db
-data/*/raw_data/**
+# But keep the directory itself and README files
 !data/*/raw_data/
-!data/*/raw_data/*.md
+!data/*/raw_data/README.md
+!results/
+!results/README.md
