@@ -18,7 +18,6 @@ This repository contains teaching materials for the **Microbial Genomics and Met
  - The raw data in FASTQ format will be downloaded and saved under Microbial-Genomics/data/tb or vc/raw_data/ .
    
 ### Quality control (QC) and data cleaning:
- - On slurm cluster request the computing resources: `srun --cpus-per-task=32 --mem=240GB  --pty bash`
 #### Running Fastqc and Multiqc on raw data:
  - `mkdir -p results/fastqc_raw/tb`
  - `mkdir -p results/fastqc_raw/vc`
