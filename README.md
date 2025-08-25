@@ -15,6 +15,8 @@ This repository contains teaching materials for the **Microbial Genomics and Met
  - cd Microbial-Genomics/
  - cd path/to/Microbial-Genomics/data/tb/metadata/; ./tb_download.sh
  - cd path/to/Microbial-Genomics/data/vc/metadata/; ./vc_download.sh
-   After downloading samples, the directory will include raw data in fastq format.
+ - After downloading samples, the directory will include raw data in fastq format.
 
 ### Quality control (QC) and data cleaning:
+ - On slurm cluster request the computing resources: srun --cpus-per-task=32 --mem=240GB  --pty bash
+ - 
