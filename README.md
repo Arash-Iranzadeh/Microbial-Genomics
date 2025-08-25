@@ -19,6 +19,7 @@ This repository contains teaching materials for the **Microbial Genomics and Met
    
 ### Quality control (QC) and data cleaning:
  - On slurm cluster request the computing resources: `srun --cpus-per-task=32 --mem=240GB  --pty bash`
+#### Running Fastqc on raw data:
  - `mkdir -p results/fastqc/raw/tb`
  - `mkdir -p results/fastqc/raw/vc`
  - `module load fastqc`
