@@ -24,5 +24,5 @@ This repository contains teaching materials for the **Microbial Genomics and Met
  - `mkdir -p results/fastqc_raw/vc`
  - `fastqc -t 32 -o ./results/fastqc/raw/tb/ ./data/tb/raw_data/*_1.fastq.gz ./data/tb/raw_data/*_2.fastq.gz`
  - `fastqc -t 32 -o ./results/fastqc/raw/vc/ ./data/vc/raw_data/*_1.fastq.gz ./data/vc/raw_data/*_2.fastq.gz`
- -  multiqc ./results/fastqc_raw/vc -n vc_multiqc_raw.html -o ./results/fastqc_raw/vc
- -  multiqc ./results/fastqc_raw/tb -n tb_multiqc_raw.html -o ./results/fastqc_raw/tb
+ -  `multiqc ./results/fastqc_raw/vc -n vc_multiqc_raw.html -o ./results/fastqc_raw/vc`
+ -  `multiqc ./results/fastqc_raw/tb -n tb_multiqc_raw.html -o ./results/fastqc_raw/tb`
