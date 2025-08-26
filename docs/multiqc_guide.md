@@ -1,99 +1,124 @@
-# How to Read a MultiQC Report
+# Reading MultiQC’s FastQC Sections (Detailed Guide)
 
-MultiQC aggregates results from bioinformatics tools such as FastQC, alignment software, and variant callers into a single, easy-to-read report. This guide explains the main sections you will see when MultiQC is applied on the FastQC results.
+MultiQC **collects all your FastQC outputs** (per-sample HTML/TXT) and merges them into a single, cross-sample dashboard. Think of it as **“FastQC at scale”**: you get every FastQC module, but now it’s easy to (a) compare samples side-by-side, (b) spot outliers, and (c) decide batch-wide actions (e.g., trimming, resequencing).
 
----
-
-## 1. General Statistics
-A summary table with key metrics for each sample:
-- **Total reads**
-- **%GC content**
-- **Mean quality score**
-- **Duplication rate**
-
-👉 Use this to quickly spot samples that deviate from the rest.
+> **Key idea:** The **Pass / Warn / Fail** badges shown in MultiQC are **FastQC’s own flags** aggregated by MultiQC. MultiQC adds the multi-sample plots/tables and quick filtering, but it doesn’t change FastQC’s logic.
 
 ---
 
-## 2. FastQC: Sequence Counts
-Shows how many reads are present in each file.  
-- **Consistent counts** = balanced sequencing.  
-- **Low counts** = poor sequencing/library prep.  
+## 1) General Statistics (FastQC summary, per sample)
+- MultiQC builds a table with essential FastQC stats (e.g., total sequences, %GC, mean quality, duplication, adapter content) for **all** samples.
+- **How to use:**
+  - Sort columns to **find outliers** fast (e.g., one sample with low total reads or unusually high adapter content).
+  - Look for **consistency** across replicates/batches; large deviations often indicate library prep or sequencing issues.
 
 ---
 
-## 3. FastQC: Per Base Sequence Quality
-Boxplots of quality scores across each base in the read.  
-- **Green (Q ≥ 30):** very good.  
-- **Orange/Red (Q < 20):** low-quality regions; consider trimming.  
+## 2) FastQC: Sequence Counts
+- **What it is:** Total reads seen by FastQC per file. MultiQC displays them together so you can check **sequencing depth balance**.
+- **Why it matters:** Depth affects downstream sensitivity and comparability.
+- **Common observations:**
+  - **Very low counts:** failed or underloaded library; may be unusable for variant calling or differential analysis.
+  - **Very high counts** relative to others: can skew batch comparisons unless analyses are normalized or downsampled.
+- **Action:** For strongly unbalanced depth, consider downsampling or resequencing the underpowered samples.
 
 ---
 
-## 4. FastQC: Per Sequence Quality Scores
-Histogram of average read quality.  
-- A strong peak at high Q is good.  
-- A left-shifted peak means too many poor reads.  
+## 3) FastQC: Per Base Sequence Quality
+- **What it is:** Boxplots of **Phred** quality score **by base position** across all reads.
+- **Typical pattern:** Highest at read start; gradual decline toward the 3′ end (more pronounced in long reads).
+- **Why it matters:** Low-quality tails increase mismatches, reduce mapping quality, and inflate false positives.
+- **Red flags:** Large stretches dipping into low quality at read ends or throughout reads.
+- **Action:** Apply quality trimming (e.g., `fastp`, `Trim Galore`, `Trimmomatic`) and remove adapter-contaminated tails before alignment/variant calling.
 
 ---
 
-## 5. FastQC: Per Base Sequence Content
-Base composition (A, T, C, G) at each position.  
-- Should be relatively flat.  
-- Strong bias may indicate contamination or adapters.  
+## 4) FastQC: Per Sequence Quality Scores
+- **What it is:** Histogram of **mean read quality** per read.
+- **Good:** Distinct peak at high Q (e.g., Q30+).
+- **Concerning:** Left-shifted or very broad distributions → many poor reads.
+- **Action:** Filter low-quality reads; if widespread, investigate run quality (cluster density, flow cell issues).
 
 ---
 
-## 6. FastQC: Per Sequence GC Content
-Distribution of GC content across reads.  
-- Should match the organism’s genome GC%.  
-- Multiple peaks = contamination.  
+## 5) FastQC: Per Base Sequence Content
+- **What it is:** Base composition (%A/%T/%C/%G) by position.
+- **Expected:** Roughly flat and overlapping after the initial ~10 bp (minor start bias is normal for many libraries).
+- **Red flags:** Sustained imbalance (e.g., A/T rich) → primer bias, contamination, or residual adapters.
+- **Action:** Verify library strategy, confirm adapters are trimmed, check for contamination.
 
 ---
 
-## 7. FastQC: Per Base N Content
-Frequency of undetermined bases ("N").  
-- Should be close to zero.  
+## 6) FastQC: Per Sequence GC Content
+- **What it is:** Distribution of **%GC per read**.
+- **Expected:** Approximately normal (bell-shaped) around the organism’s genome GC.
+- **Red flags:**
+  - Shifted peak: off-target species/contamination.
+  - Multi-modal distribution: mixed content (e.g., host+microbe) or biased capture.
+- **Action:** Confirm sample identity and pipeline inputs; consider decontamination filters for metagenomic contexts.
 
 ---
 
-## 8. FastQC: Sequence Length Distribution
-Distribution of read lengths.  
-- Fixed for Illumina runs (e.g., 150 bp).  
-- Variable = trimming or artifacts.  
+## 7) FastQC: Per Base N Content
+- **What it is:** Proportion of **“N” (uncalled bases)** by position.
+- **Expected:** Near zero at all positions.
+- **Red flags:** Rising N rates at read ends or across reads → chemistry/cycle failures.
+- **Action:** Trim affected tails; excessive Ns suggest a poor run or damaged libraries.
 
 ---
 
-## 9. FastQC: Sequence Duplication Levels
-Shows how many reads are duplicated.  
-- Low duplication = good diversity.  
-- High duplication = possible PCR artifacts or low complexity.  
+## 8) FastQC: Sequence Length Distribution
+- **What it is:** Read length histogram.
+- **Expected:** Single sharp peak at the intended read length (e.g., 150 bp).
+- **Red flags:** Broad/variable lengths (beyond intentional trimming) → incomplete reads or aggressive trimming from low quality/adapters.
+- **Action:** Confirm consistent read length in the run configuration; if trimming created heavy variability, ensure downstream tools tolerate variable lengths.
 
 ---
 
-## 10. FastQC: Overrepresented Sequences
-Lists sequences appearing more often than expected.  
-- Usually adapters or rRNA.  
-- Should be trimmed or removed.  
+## 9) FastQC: Sequence Duplication Levels
+- **What it is:** Fraction of reads appearing **more than once** (identical sequences), binned by duplication count.
+- **Interpretation:**
+  - **Low duplication:** Good library complexity.
+  - **High duplication** can arise from:
+    - **Low input / over-amplification** (PCR duplicates dominate).
+    - **Over-sequencing** a small library (you “ran out” of unique molecules).
+    - **Biological reality** (e.g., highly expressed transcripts in RNA-seq, targeted panels).
+- **Action:**
+  - For WGS/WES: high duplication → consider resequencing or revisiting library prep; mark duplicates post-alignment.
+  - For RNA-seq: moderate duplication can be normal; assess with mapping-level metrics and expression distributions.
 
 ---
 
-## 11. FastQC: Adapter Content
-Proportion of reads containing adapter sequences.  
-- Should be minimal.  
-- If high, trim adapters before alignment.  
+## 10) FastQC: Overrepresented Sequences
+- **What it is:** Specific sequences occurring more often than expected.
+- **Common causes:** Adapters/primers, rRNA, PhiX, or other technical/biological contaminants.
+- **Action:** If adapters/primers → re-trim; if biological (rRNA) → consider depletion; if spike-in → confirm expected proportions.
 
 ---
 
-## 12. Other Modules
-Depending on the pipeline, you may also see:
-- **Alignment Stats** (mapping rate, paired reads)  
-- **Insert Size Distribution** (paired-end libraries)  
-- **Variant Calling Metrics** (SNP/indel counts, Ti/Tv ratio)  
+## 11) FastQC: Adapter Content
+- **What it is:** Estimated fraction of adapter sequence across read positions.
+- **Expected:** Close to zero after proper trimming.
+- **Red flags:** Rising adapter signal toward the 3′ end; elevated adapter in many samples indicates systematic under-trimming or short inserts.
+- **Action:** Re-run adapter trimming with correct adapter set and minimum-length settings; verify with a second FastQC/MultiQC pass.
 
 ---
 
-## ✅ Summary
-- Look for **consistency across samples**.  
-- Watch for **low-quality bases** or **adapter contamination**.  
-- Use trimming/cleaning tools (e.g., `Trimmomatic`, `fastp`) before downstream analysis if needed.  
+## 12) (If present) Per Tile Sequence Quality / K-mer Content
+- **Per Tile Quality:** Identifies **spatial** issues on the flow cell (bad tiles). Stripes/bands of low quality suggest hardware/localized run problems.
+- **K-mer Content:** Enrichment of short motifs. Strong k-mer spikes often indicate adapters/primers or sequence bias.
+- **Action:** For tile issues, coordinate with the sequencing facility; for k-mers, confirm and trim adapters/primers, reassess library design.
 
+---
+
+## Practical Workflow With MultiQC + FastQC
+1. **Run FastQC for all FASTQs** → **Run MultiQC** on the folder.  
+2. In MultiQC:
+   - Start at **General Statistics** → sort columns to find **outliers**.
+   - Check **Sequence Counts** → ensure reasonable, comparable depth.
+   - Inspect **Per Base Quality** and **Adapter Content** → decide **trimming**.
+   - Review **Duplication** → infer **library complexity** and decide on **duplicate marking**.
+   - Validate **GC Content** and **Base Composition** → rule out contamination.
+3. **Fix issues** (trim/filter/mark duplicates) → **Re-run FastQC + MultiQC** to confirm improvements.
+
+> **Rule of thumb:** Any systematic issue visible across multiple samples typically points to **library prep**, **run settings**, or **trimming parameters**; isolated outliers are **sample-specific** problems.
