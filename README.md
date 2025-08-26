@@ -22,7 +22,7 @@ This repository contains teaching materials for the **Microbial Genomics and Met
 
 | Date       | Topic                                                                | Duration | Tools / Notes                              |
 |------------|----------------------------------------------------------------------|----------|--------------------------------------------|
-| **Sep 1**  | Introduction to command line interface (Git Bash)                    | 90 min   | Unix basics     |
+| **Sep 1**  | Introduction to command line interface (Git Bash)                    | 90 min   | Unix basics                                |
 | **Sep 2**  | Quality checking & species identification                            | 60 min   | FastQC, MultiQC, fastp, Kraken2            |
 |            | De novo & reference-based assembly, annotation (co-teaching)         | 60 min   | SPAdes, BBMap, Prokka, QUAST               |
 |            | Exploring pangenomes and genomic diversity                           | 90 min   | Panaroo                                    |
