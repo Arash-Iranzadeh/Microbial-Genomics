@@ -31,5 +31,5 @@ This repository contains teaching materials for the **Microbial Genomics and Met
 |            | Phylogenetic tree visualisation                                      | 60 min   | R, iTOL                                    |
 | **Sep 4**  | Multi-locus sequence typing and serotyping                           | 60 min   | MLST tools, serotyping workflows           |
 
-ry Layout
+
 
