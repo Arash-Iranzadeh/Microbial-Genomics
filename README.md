@@ -1,7 +1,7 @@
-# Microbial Genomics and Metagenomics for Clinical and Public Health Applications
+# Microbial Genomics
 ## University of Cape Town · 1 – 12 September 2025
 
-This repository contains teaching materials for the **Microbial Genomics and Metagenomics for Clinical and Public Health Applications** workshop.
+This repository contains teaching materials for the **Microbial Genomics** workshop.
 
 ## Structure
 - `data/` – metadata and download scripts (TB and VC datasets).
