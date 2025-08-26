@@ -19,7 +19,6 @@ This repository contains teaching materials for the **Microbial Genomics and Met
  - `cd path/to/Microbial-Genomics/data/tb/metadata/`; `./tb_download.sh`
  - `cd path/to/Microbial-Genomics/data/vc/metadata/`; `./vc_download.sh`
  - The raw data in FASTQ format will be downloaded and saved under Microbial-Genomics/data/tb or vc/raw_data/
- - 
 
 ## Schedule – Sessions by Arash Iranzadeh
 
