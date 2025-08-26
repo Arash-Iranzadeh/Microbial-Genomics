@@ -1,7 +1,6 @@
 # How to Read a MultiQC Report
 
-MultiQC aggregates results from bioinformatics tools such as FastQC, alignment software, and variant callers into a single, easy-to-read report.  
-This guide explains the main sections you will see.
+MultiQC aggregates results from bioinformatics tools such as FastQC, alignment software, and variant callers into a single, easy-to-read report. This guide explains the main sections you will see when MultiQC is applied on the FastQC results.
 
 ---
 
