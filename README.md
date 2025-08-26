@@ -9,6 +9,8 @@ This repository contains teaching materials for the **Microbial Genomics and Met
 - `results/` – representative outputs.
 - `docs/` – teaching materials.
 
+> **Note:** Raw FASTQ files and large results are not stored in this repository. Place your sequencing data into `data/tb/raw_data/` or `data/vc/raw_data/` or locally where you prefer, update the paths in scripts accordingcly.
+
 ### Clone repository:
 - git clone https://github.com/Arash-Iranzadeh/Microbial-Genomics.git
 
@@ -16,7 +18,8 @@ This repository contains teaching materials for the **Microbial Genomics and Met
  - `cd Microbial-Genomics/`
  - `cd path/to/Microbial-Genomics/data/tb/metadata/`; `./tb_download.sh`
  - `cd path/to/Microbial-Genomics/data/vc/metadata/`; `./vc_download.sh`
- - The raw data in FASTQ format will be downloaded and saved under Microbial-Genomics/data/tb or vc/raw_data/ 
+ - The raw data in FASTQ format will be downloaded and saved under Microbial-Genomics/data/tb or vc/raw_data/
+ - 
 
 ## Schedule – Sessions by Arash Iranzadeh
 
