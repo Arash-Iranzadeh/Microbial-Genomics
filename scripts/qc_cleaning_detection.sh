@@ -12,10 +12,9 @@ set -euo pipefail
 # - Build KmerFinder DBs (bacteria + all)
 # - (Example) KmerFinder on fastp-cleaned reads
 # ===========================================
-# if working on a cluster:
-module load fastqc multiqc trimmomatic kraken2
 
 THREADS=32
+
 # Input locations
 TB_RAW="data/tb/raw_data"
 VC_RAW="data/vc/raw_data"
@@ -128,7 +127,9 @@ echo "=== 5) Build Kraken2 databases (optional but included here) ==="
 # A) Bacteria-only DB
 if [ ! -f ./kraken2_db_bacteria/hash.k2d ]; then
   echo "[Kraken2] Preparing bacteria-only DB at ./kraken2_db_bacteria (this may take time)"
+  kraken2-build --download-taxonomy --db ./kraken2_db_bacteria
   kraken2-build --download-library bacteria --threads ${THREADS} --db ./kraken2_db_bacteria
+  kraken2-build --build --threads ${THREADS} --db ./kraken2_db_bacteria
 fi
 
 # B) Standard DB (prepackaged helper; also takes time/disk)
@@ -152,90 +153,30 @@ else
   echo "No Kraken2 DB available; skipping Kraken classification."
 fi
 
-echo "=== 6) Kraken2 on FASTP- and TRIMMOMATIC-cleaned reads (if DB available) ==="
-
-# Make sure we actually have a DB
-if [ -z "$KRAKEN_DB" ] || [ ! -f "$KRAKEN_DB/hash.k2d" ]; then
-  echo "No Kraken2 DB available; skipping Kraken classification."
-else
-  echo "Using Kraken2 DB: $KRAKEN_DB"
-
-  # Create output folders (fastp + trimmomatic, TB + VC)
-  mkdir -p results/kraken2_fastp/tb/reports \
-           results/kraken2_fastp/tb/reads_classified \
-           results/kraken2_fastp/tb/reads_unclassified \
-           results/kraken2_fastp/vc/reports \
-           results/kraken2_fastp/vc/reads_classified \
-           results/kraken2_fastp/vc/reads_unclassified \
-           results/kraken2_trimmomatic/tb/reports \
-           results/kraken2_trimmomatic/tb/reads_classified \
-           results/kraken2_trimmomatic/tb/reads_unclassified \
-           results/kraken2_trimmomatic/vc/reports \
-           results/kraken2_trimmomatic/vc/reads_classified \
-           results/kraken2_trimmomatic/vc/reads_unclassified
-
-  # -------- FASTP → TB --------
+echo "=== 6) Kraken2 on FASTP-cleaned reads (if DB available) ==="
+if [ -n "$KRAKEN_DB" ]; then
+  # TB
   for R1P in results/trimmed_fastp/tb/*_1P.fastq.gz; do
     [ -e "$R1P" ] || continue
     R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
     SAMPLE=$(basename "$R1P" | sed 's/_1P\.fastq\.gz//')
-    echo "[TB|Kraken2|fastp] $SAMPLE"
+    echo "[TB|Kraken2] $SAMPLE"
     kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
       --paired "$R1P" "$R2P" \
-      --gzip-compressed --use-names --confidence 0.1 \
-      --classified-out   "results/kraken2_fastp/tb/reads_classified/${SAMPLE}_#.classified.fastq" \
-      --unclassified-out "results/kraken2_fastp/tb/reads_unclassified/${SAMPLE}_#.unclassified.fastq" \
-      --report "results/kraken2_fastp/tb/reports/${SAMPLE}.report" \
-      --output "results/kraken2_fastp/tb/reports/${SAMPLE}.kraken"
+      --report "results/kraken2_fastp/tb/${SAMPLE}.report" \
+      --output "results/kraken2_fastp/tb/${SAMPLE}.kraken"
   done
-
-  # -------- FASTP → VC --------
+  # VC
   for R1P in results/trimmed_fastp/vc/*_1P.fastq.gz; do
     [ -e "$R1P" ] || continue
     R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
     SAMPLE=$(basename "$R1P" | sed 's/_1P\.fastq\.gz//')
-    echo "[VC|Kraken2|fastp] $SAMPLE"
+    echo "[VC|Kraken2] $SAMPLE"
     kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
       --paired "$R1P" "$R2P" \
-      --gzip-compressed --use-names --confidence 0.1 \
-      --classified-out   "results/kraken2_fastp/vc/reads_classified/${SAMPLE}_#.classified.fastq" \
-      --unclassified-out "results/kraken2_fastp/vc/reads_unclassified/${SAMPLE}_#.unclassified.fastq" \
-      --report "results/kraken2_fastp/vc/reports/${SAMPLE}.report" \
-      --output "results/kraken2_fastp/vc/reports/${SAMPLE}.kraken"
+      --report "results/kraken2_fastp/vc/${SAMPLE}.report" \
+      --output "results/kraken2_fastp/vc/${SAMPLE}.kraken"
   done
-
-  # -------- TRIMMOMATIC → TB --------
-  for R1P in results/trimmed_trimmomatic/tb/*_1P.fastq.gz; do
-    [ -e "$R1P" ] || continue
-    R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
-    SAMPLE=$(basename "$R1P" | sed 's/_1P\.fastq\.gz//')
-    echo "[TB|Kraken2|trimmomatic] $SAMPLE"
-    kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
-      --paired "$R1P" "$R2P" \
-      --gzip-compressed --use-names --confidence 0.1 \
-      --classified-out   "results/kraken2_trimmomatic/tb/reads_classified/${SAMPLE}_#.classified.fastq" \
-      --unclassified-out "results/kraken2_trimmomatic/tb/reads_unclassified/${SAMPLE}_#.unclassified.fastq" \
-      --report "results/kraken2_trimmomatic/tb/reports/${SAMPLE}.report" \
-      --output "results/kraken2_trimmomatic/tb/reports/${SAMPLE}.kraken"
-  done
-
-  # -------- TRIMMOMATIC → VC --------
-  for R1P in results/trimmed_trimmomatic/vc/*_1P.fastq.gz; do
-    [ -e "$R1P" ] || continue
-    R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
-    SAMPLE=$(basename "$R1P" | sed 's/_1P\.fastq\.gz//')
-    echo "[VC|Kraken2|trimmomatic] $SAMPLE"
-    kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
-      --paired "$R1P" "$R2P" \
-      --gzip-compressed --use-names --confidence 0.1 \
-      --classified-out   "results/kraken2_trimmomatic/vc/reads_classified/${SAMPLE}_#.classified.fastq" \
-      --unclassified-out "results/kraken2_trimmomatic/vc/reads_unclassified/${SAMPLE}_#.unclassified.fastq" \
-      --report "results/kraken2_trimmomatic/vc/reports/${SAMPLE}.report" \
-      --output "results/kraken2_trimmomatic/vc/reports/${SAMPLE}.kraken"
-  done
-
-  echo "Kraken2 completed for both fastp and Trimmomatic outputs."
-  echo "Reports are under: results/kraken2_fastp/*/reports/ and results/kraken2_trimmomatic/*/reports/"
 fi
 
 echo "=== 7) Build KmerFinder databases (bacteria + all) ==="
