@@ -9,7 +9,7 @@
 
 THREADS=32
 ADAPT="/software/bio/trimmomatic/0.39/adapters/TruSeq3-PE.fa"   # Trimmomatic adapters
-
+FASTP="/users/arash/tools/fastp"
 # Set KRAKEN_DB if you already have one; otherwise we will fetch MiniKraken2 (~8 GB)
 KRAKEN_DB="${KRAKEN_DB:-}"
 
@@ -63,7 +63,7 @@ for R1 in data/tb/raw_data/*_1.fastq.gz; do
   R2=${R1/_1.fastq.gz/_2.fastq.gz}
   SAMPLE=$(basename "$R1" | sed 's/_1\.fastq\.gz//')
   echo "[TB|fastp] $SAMPLE"
-  fastp -w ${THREADS} \
+  ${FASTP} -w ${THREADS} \
     -i "$R1" -I "$R2" \
     -o "results/trimmed_fastp/tb/${SAMPLE}_1P.fastq.gz" \
     -O "results/trimmed_fastp/tb/${SAMPLE}_2P.fastq.gz" \
@@ -78,7 +78,7 @@ for R1 in data/vc/raw_data/*_1.fastq.gz; do
   R2=${R1/_1.fastq.gz/_2.fastq.gz}
   SAMPLE=$(basename "$R1" | sed 's/_1\.fastq\.gz//')
   echo "[VC|fastp] $SAMPLE"
-  fastp -w ${THREADS} \
+  ${FASTP} -w ${THREADS} \
     -i "$R1" -I "$R2" \
     -o "results/trimmed_fastp/vc/${SAMPLE}_1P.fastq.gz" \
     -O "results/trimmed_fastp/vc/${SAMPLE}_2P.fastq.gz" \
