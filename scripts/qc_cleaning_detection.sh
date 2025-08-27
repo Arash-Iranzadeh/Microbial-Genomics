@@ -6,7 +6,7 @@
 #   data/tb/raw_data/*_1.fastq.gz and *_2.fastq.gz
 #   data/vc/raw_data/*_1.fastq.gz and *_2.fastq.gz
 # Results go under results/
-
+module load fastqc multiqc trimmomatic kraken2
 THREADS=32
 ADAPT="/software/bio/trimmomatic/0.39/adapters/TruSeq3-PE.fa"   # Trimmomatic adapters
 FASTP="/users/arash/tools/fastp"
