@@ -139,10 +139,10 @@ for R1P in results/trimmed_trimmomatic/tb/*_1P.fastq.gz; do
   SAMPLE=$(basename "$R1P" "_1_1P.fastq.gz")
   echo "[TB|Kraken2] $SAMPLE"
   kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
+    --quick --confidence 0.1 --memory-mapping --gzip-compressed --use-names \
     --paired "$R1P" "$R2P" \
     --report "results/kraken2_trimmomatic/tb/${SAMPLE}.report" \
-    --output "results/kraken2_trimmomatic/tb/${SAMPLE}.kraken"\
-    --quick --confidence 0.1 --memory-mapping --gzip-compressed
+    --output "results/kraken2_trimmomatic/tb/${SAMPLE}.kraken"
 done
 
 # VC
@@ -151,11 +151,11 @@ for R1P in results/trimmed_trimmomatic/vc/*_1P.fastq.gz; do
  SAMPLE=$(basename "$R1P" "_1_1P.fastq.gz")
  echo "[VC|Kraken2] $SAMPLE"
  kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
+  --quick --confidence 0.1 --memory-mapping --gzip-compressed --use-names \
   --paired "$R1P" "$R2P" \
   --report "results/kraken2_trimmomatic/vc/${SAMPLE}.report" \
-  --output "results/kraken2_trimmomatic/vc/${SAMPLE}.kraken" \
-  --quick --confidence 0.1 --memory-mapping --gzip-compressed
-done
+  --output "results/kraken2_trimmomatic/vc/${SAMPLE}.kraken"
+  done
 
 time2=$SECONDS
 echo "Elapsed time for kraken2 running on all samples: $(((time2 - time1)/60)) minutes!"
