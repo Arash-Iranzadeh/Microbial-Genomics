@@ -15,7 +15,7 @@ FASTP="/cbio/training/courses/2025/micmet-genomics/fastp"
 THREADS=$(nproc)
 # Input locations
 TB_RAW="/cbio/training/courses/2025/micmet-genomics/Dataset_Mt_Vc/tb/raw_data"
-VC_RAW="/cbio/training/courses/2025/micmet-genomics/Dataset_Mt_Vc/tb/raw_data"
+VC_RAW="/cbio/training/courses/2025/micmet-genomics/Dataset_Mt_Vc/vc/raw_data"
 
 # Trimmomatic adapters:
 # We combine all adapters
