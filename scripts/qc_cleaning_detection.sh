@@ -13,20 +13,20 @@ set -euo pipefail
 # - (Example) KmerFinder on fastp-cleaned reads
 # ===========================================
 
-THREADS=32
+module load fastqc multiqc trimmomatic kraken2
+FASTP="/cbio/training/courses/2025/micmet-genomics/fastp"
+THREADS=$(nproc)
 
 # Input locations
-TB_RAW="data/tb/raw_data"
-VC_RAW="data/vc/raw_data"
+TB_RAW="/cbio/training/courses/2025/micmet-genomics/Dataset_Mt_Vc/tb/raw_data"
+VC_RAW="/cbio/training/courses/2025/micmet-genomics/Dataset_Mt_Vc/tb/raw_data"
 
 # Trimmomatic adapters:
-# We combine Nextera + TruSeq3 (you saw both in MultiQC).
-ADAPT_COMBO="$HOME/adapters/Combo_Nextera_TruSeq3_PE.fa"
+# We combine all adapters
+ADAPT_COMBO="/cbio/training/courses/2025/micmet-genomics/timmomatic_adapter_Combo.fa"
 mkdir -p "$(dirname "$ADAPT_COMBO")"
 if [ ! -s "$ADAPT_COMBO" ]; then
-  cat /software/bio/trimmomatic/0.39/adapters/NexteraPE-PE.fa \
-      /software/bio/trimmomatic/0.39/adapters/TruSeq3-PE.fa \
-      > "$ADAPT_COMBO"
+  cat /software/bio/trimmomatic/0.39/adapters/* > "$ADAPT_COMBO"
 fi
 
 # Output folders
@@ -38,6 +38,7 @@ mkdir -p results/qc_trim_fastp/tb results/qc_trim_fastp/vc
 mkdir -p results/kraken2_fastp/tb results/kraken2_fastp/vc
 mkdir -p results/kmerfinder/tb results/kmerfinder/vc
 
+time1=$SECONDS
 echo "=== 1) FastQC on RAW reads + MultiQC ==="
 # TB
 fastqc -t ${THREADS} -o results/qc_raw/tb ${TB_RAW}/*_1.fastq.gz ${TB_RAW}/*_2.fastq.gz
@@ -51,7 +52,7 @@ echo "=== 2) Trimming with TRIMMOMATIC (saved in results/trimmed_trimmomatic) ==
 for R1 in ${TB_RAW}/*_1.fastq.gz; do
   [ -e "$R1" ] || continue
   R2=${R1/_1.fastq.gz/_2.fastq.gz}
-  SAMPLE=$(basename "$R1" | sed 's/_1\.fastq\.gz//')
+  SAMPLE=$(basename "$R1" ".fastq.gz")
   echo "[TB|Trimmomatic] $SAMPLE"
   trimmomatic PE -threads ${THREADS} -phred33 \
     "$R1" "$R2" \
@@ -60,17 +61,17 @@ for R1 in ${TB_RAW}/*_1.fastq.gz; do
     ILLUMINACLIP:"${ADAPT_COMBO}":2:30:10 SLIDINGWINDOW:4:20 LEADING:3 TRAILING:3 MINLEN:50
 done
 
-# VC (MINLEN 36)
+# VC (MINLEN 50)
 for R1 in ${VC_RAW}/*_1.fastq.gz; do
   [ -e "$R1" ] || continue
   R2=${R1/_1.fastq.gz/_2.fastq.gz}
-  SAMPLE=$(basename "$R1" | sed 's/_1\.fastq\.gz//')
+  SAMPLE=$(basename "$R1" ".fastq.gz")
   echo "[VC|Trimmomatic] $SAMPLE"
   trimmomatic PE -threads ${THREADS} -phred33 \
     "$R1" "$R2" \
     "results/trimmed_trimmomatic/vc/${SAMPLE}_1P.fastq.gz" "results/trimmed_trimmomatic/vc/${SAMPLE}_1U.fastq.gz" \
     "results/trimmed_trimmomatic/vc/${SAMPLE}_2P.fastq.gz" "results/trimmed_trimmomatic/vc/${SAMPLE}_2U.fastq.gz" \
-    ILLUMINACLIP:"${ADAPT_COMBO}":2:30:10 SLIDINGWINDOW:4:20 LEADING:3 TRAILING:3 MINLEN:36
+    ILLUMINACLIP:"${ADAPT_COMBO}":2:30:10 SLIDINGWINDOW:4:20 LEADING:3 TRAILING:3 MINLEN:50
 done
 
 echo "=== 3) Trimming with FASTP (saved in results/trimmed_fastp) ==="
@@ -78,30 +79,30 @@ echo "=== 3) Trimming with FASTP (saved in results/trimmed_fastp) ==="
 for R1 in ${TB_RAW}/*_1.fastq.gz; do
   [ -e "$R1" ] || continue
   R2=${R1/_1.fastq.gz/_2.fastq.gz}
-  SAMPLE=$(basename "$R1" | sed 's/_1\.fastq\.gz//')
+  SAMPLE=$(basename "$R1" ".fastq.gz")
   echo "[TB|fastp] $SAMPLE"
-  fastp -w ${THREADS} \
+  ${FASTP} -w ${THREADS} \
     -i "$R1" -I "$R2" \
     -o "results/trimmed_fastp/tb/${SAMPLE}_1P.fastq.gz" \
     -O "results/trimmed_fastp/tb/${SAMPLE}_2P.fastq.gz" \
     --detect_adapter_for_pe --trim_poly_g --trim_poly_x \
-    --qualified_quality_phred 20 --length_required 50 \
+    --qualified_quality_phred 30 --length_required 50 \
     -h "results/trimmed_fastp/tb/${SAMPLE}_fastp.html" \
     -j "results/trimmed_fastp/tb/${SAMPLE}_fastp.json"
 done
 
-# VC (length_required 36) + polyG/polyX trimming
+# VC (length_required 50) + polyG/polyX trimming
 for R1 in ${VC_RAW}/*_1.fastq.gz; do
   [ -e "$R1" ] || continue
   R2=${R1/_1.fastq.gz/_2.fastq.gz}
-  SAMPLE=$(basename "$R1" | sed 's/_1\.fastq\.gz//')
+  SAMPLE=$(basename "$R1" ".fastq.gz")
   echo "[VC|fastp] $SAMPLE"
-  fastp -w ${THREADS} \
+  ${FASTP} -w ${THREADS} \
     -i "$R1" -I "$R2" \
     -o "results/trimmed_fastp/vc/${SAMPLE}_1P.fastq.gz" \
     -O "results/trimmed_fastp/vc/${SAMPLE}_2P.fastq.gz" \
     --detect_adapter_for_pe --trim_poly_g --trim_poly_x \
-    --qualified_quality_phred 20 --length_required 36 \
+    --qualified_quality_phred 30 --length_required 50 \
     -h "results/trimmed_fastp/vc/${SAMPLE}_fastp.html" \
     -j "results/trimmed_fastp/vc/${SAMPLE}_fastp.json"
 done
@@ -118,68 +119,70 @@ fastqc -t ${THREADS} -o results/qc_trim_fastp/tb results/trimmed_fastp/tb/*_1P.f
 fastqc -t ${THREADS} -o results/qc_trim_fastp/vc results/trimmed_fastp/vc/*_1P.fastq.gz results/trimmed_fastp/vc/*_2P.fastq.gz
 multiqc results/qc_trim_fastp/tb -n tb_multiqc_trimmed_fastp.html -o results/qc_trim_fastp/tb
 multiqc results/qc_trim_fastp/vc -n vc_multiqc_trimmed_fastp.html -o results/qc_trim_fastp/vc
+time2=$SECONDS
+echo "Elapsed time for QC and cleaning: $(((time2 - time1)/60)) minutes!"
+
 
 # ===========================================
 # DB BUILDING + DETECTION
 # ===========================================
+# If kraken database is not available, make it:
+# Preparing standard Kraken DB (this takes time)
+# kraken2-build --standard --threads ${THREADS} --db /path/to/kraken2_db_standard
 
-echo "=== 5) Build Kraken2 databases (optional but included here) ==="
-# A) Bacteria-only DB
-if [ ! -f ./kraken2_db_bacteria/hash.k2d ]; then
-  echo "[Kraken2] Preparing bacteria-only DB at ./kraken2_db_bacteria (this may take time)"
-  kraken2-build --download-taxonomy --db ./kraken2_db_bacteria
-  kraken2-build --download-library bacteria --threads ${THREADS} --db ./kraken2_db_bacteria
-  kraken2-build --build --threads ${THREADS} --db ./kraken2_db_bacteria
-fi
+# Preparing bacteria-only DB
+# kraken2-build --download-taxonomy --db ./kraken2_db_bacteria
+# kraken2-build --download-library bacteria --threads ${THREADS} --db ./kraken2_db_bacteria
+# kraken2-build --build --threads ${THREADS} --db ./kraken2_db_bacteria
 
-# B) Standard DB (prepackaged helper; also takes time/disk)
-if [ ! -f ./kraken2_db_standard/hash.k2d ]; then
-  echo "[Kraken2] Preparing STANDARD DB at ./kraken2_db_standard (large; may take hours)"
-  kraken2-build --standard --threads ${THREADS} --db ./kraken2_db_standard
-fi
-
-# Choose which DB to use (prefer standard if built)
-if [ -f ./kraken2_db_standard/hash.k2d ]; then
-  KRAKEN_DB="./kraken2_db_standard"
-elif [ -f ./kraken2_db_bacteria/hash.k2d ]; then
-  KRAKEN_DB="./kraken2_db_bacteria"
-else
-  KRAKEN_DB=""
-fi
-
-if [ -n "$KRAKEN_DB" ]; then
-  echo "Using Kraken2 DB: $KRAKEN_DB"
-else
-  echo "No Kraken2 DB available; skipping Kraken classification."
-fi
-
-echo "=== 6) Kraken2 on FASTP-cleaned reads (if DB available) ==="
-if [ -n "$KRAKEN_DB" ]; then
-  # TB
-  for R1P in results/trimmed_fastp/tb/*_1P.fastq.gz; do
-    [ -e "$R1P" ] || continue
-    R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
-    SAMPLE=$(basename "$R1P" | sed 's/_1P\.fastq\.gz//')
-    echo "[TB|Kraken2] $SAMPLE"
-    kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
-      --paired "$R1P" "$R2P" \
-      --report "results/kraken2_fastp/tb/${SAMPLE}.report" \
-      --output "results/kraken2_fastp/tb/${SAMPLE}.kraken"
-  done
+KRAKEN_DB="/cbio/training/courses/2025/micmet-genomics/kraken2_db_standard"
+time1=$SECONDS
+echo "=== 5) Kraken2 on FASTP-cleaned reads (if DB available) ==="
+for R1P in results/trimmed_fastp/tb/*_1P.fastq.gz; do
+  R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
+  SAMPLE=$(basename "$R1P" ".fastq.gz")
+  echo "[TB|Kraken2] $SAMPLE"
+  kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
+    --paired "$R1P" "$R2P" \
+    --report "results/kraken2_fastp/tb/${SAMPLE}.report" \
+    --output "results/kraken2_fastp/tb/${SAMPLE}.kraken"\
+    --quick --confidence 0.1 --memory-mapping --gzip-compressed
+done
   # VC
-  for R1P in results/trimmed_fastp/vc/*_1P.fastq.gz; do
-    [ -e "$R1P" ] || continue
-    R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
-    SAMPLE=$(basename "$R1P" | sed 's/_1P\.fastq\.gz//')
-    echo "[VC|Kraken2] $SAMPLE"
-    kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
-      --paired "$R1P" "$R2P" \
-      --report "results/kraken2_fastp/vc/${SAMPLE}.report" \
-      --output "results/kraken2_fastp/vc/${SAMPLE}.kraken"
-  done
-fi
+for R1P in results/trimmed_fastp/vc/*_1P.fastq.gz; do
+ R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
+ SAMPLE=$(basename "$R1P" | sed 's/_1P\.fastq\.gz//')
+ echo "[VC|Kraken2] $SAMPLE"
+ kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
+  --paired "$R1P" "$R2P" \
+  --report "results/kraken2_fastp/vc/${SAMPLE}.report" \
+  --output "results/kraken2_fastp/vc/${SAMPLE}.kraken" \
+   --quick --confidence 0.1 --memory-mapping --gzip-compressed
+done
+time2=$SECONDS
+echo "Elapsed time for kraken2 running on all samples: $(((time2 - time1)/60)) minutes!"
 
-echo "=== 7) Build KmerFinder databases (bacteria + all) ==="
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+echo "=== 6) Build KmerFinder databases (bacteria + all) ==="
 # Your commands, with light timing around them
 echo "Making KmerFinder bacterial database ..."
 t1=$SECONDS
