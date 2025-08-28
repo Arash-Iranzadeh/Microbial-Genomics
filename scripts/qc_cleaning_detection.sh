@@ -136,7 +136,7 @@ echo "=== 5) Kraken2 on FASTP-cleaned reads (if DB available) ==="
 # TB
 for R1P in results/trimmed_trimmomatic/tb/*_1P.fastq.gz; do
   R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
-  SAMPLE=$(basename "$R1P" ".fastq.gz")
+  SAMPLE=$(basename "$R1P" "_1_1P.fastq.gz")
   echo "[TB|Kraken2] $SAMPLE"
   kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
     --paired "$R1P" "$R2P" \
@@ -148,7 +148,7 @@ done
 # VC
 for R1P in results/trimmed_trimmomatic/vc/*_1P.fastq.gz; do
  R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
- SAMPLE=$(basename "$R1P" | sed 's/_1P\.fastq\.gz//')
+ SAMPLE=$(basename "$R1P" "_1_1P.fastq.gz")
  echo "[VC|Kraken2] $SAMPLE"
  kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
   --paired "$R1P" "$R2P" \
