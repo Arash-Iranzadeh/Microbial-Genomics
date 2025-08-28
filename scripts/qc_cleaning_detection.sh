@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
 # ===========================================
 # QC + Cleaning + Detection (simple & clear)
 # - FastQC + MultiQC (raw)
@@ -8,15 +7,12 @@ set -euo pipefail
 # - fastp (trim)       -> separate outputs
 # - FastQC + MultiQC (trimmed by each tool)
 # - Build Kraken2 DBs (bacteria + standard)
-# - Kraken2 on fastp-cleaned reads
-# - Build KmerFinder DBs (bacteria + all)
-# - (Example) KmerFinder on fastp-cleaned reads
+# - Kraken2 on cleaned reads
 # ===========================================
 
 module load fastqc multiqc trimmomatic kraken2
 FASTP="/cbio/training/courses/2025/micmet-genomics/fastp"
 THREADS=$(nproc)
-
 # Input locations
 TB_RAW="/cbio/training/courses/2025/micmet-genomics/Dataset_Mt_Vc/tb/raw_data"
 VC_RAW="/cbio/training/courses/2025/micmet-genomics/Dataset_Mt_Vc/tb/raw_data"
@@ -35,8 +31,7 @@ mkdir -p results/trimmed_trimmomatic/tb results/trimmed_trimmomatic/vc
 mkdir -p results/trimmed_fastp/tb results/trimmed_fastp/vc
 mkdir -p results/qc_trim_trimmomatic/tb results/qc_trim_trimmomatic/vc
 mkdir -p results/qc_trim_fastp/tb results/qc_trim_fastp/vc
-mkdir -p results/kraken2_fastp/tb results/kraken2_fastp/vc
-mkdir -p results/kmerfinder/tb results/kmerfinder/vc
+mkdir -p results/kraken2_trimmomatic/tb results/kraken2_trimmomatic/vc
 
 time1=$SECONDS
 echo "=== 1) FastQC on RAW reads + MultiQC ==="
@@ -119,9 +114,9 @@ fastqc -t ${THREADS} -o results/qc_trim_fastp/tb results/trimmed_fastp/tb/*_1P.f
 fastqc -t ${THREADS} -o results/qc_trim_fastp/vc results/trimmed_fastp/vc/*_1P.fastq.gz results/trimmed_fastp/vc/*_2P.fastq.gz
 multiqc results/qc_trim_fastp/tb -n tb_multiqc_trimmed_fastp.html -o results/qc_trim_fastp/tb
 multiqc results/qc_trim_fastp/vc -n vc_multiqc_trimmed_fastp.html -o results/qc_trim_fastp/vc
-time2=$SECONDS
-echo "Elapsed time for QC and cleaning: $(((time2 - time1)/60)) minutes!"
 
+time2=$SECONDS
+echo "Elapsed time for QC and cleaning of all samples: $(((time2 - time1)/60)) minutes!"
 
 # ===========================================
 # DB BUILDING + DETECTION
@@ -138,98 +133,32 @@ echo "Elapsed time for QC and cleaning: $(((time2 - time1)/60)) minutes!"
 KRAKEN_DB="/cbio/training/courses/2025/micmet-genomics/kraken2_db_standard"
 time1=$SECONDS
 echo "=== 5) Kraken2 on FASTP-cleaned reads (if DB available) ==="
-for R1P in results/trimmed_fastp/tb/*_1P.fastq.gz; do
+# TB
+for R1P in results/trimmed_trimmomatic/tb/*_1P.fastq.gz; do
   R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
   SAMPLE=$(basename "$R1P" ".fastq.gz")
   echo "[TB|Kraken2] $SAMPLE"
   kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
     --paired "$R1P" "$R2P" \
-    --report "results/kraken2_fastp/tb/${SAMPLE}.report" \
-    --output "results/kraken2_fastp/tb/${SAMPLE}.kraken"\
+    --report "results/kraken2_trimmomatic/tb/${SAMPLE}.report" \
+    --output "results/kraken2_trimmomatic/tb/${SAMPLE}.kraken"\
     --quick --confidence 0.1 --memory-mapping --gzip-compressed
 done
-  # VC
-for R1P in results/trimmed_fastp/vc/*_1P.fastq.gz; do
+
+# VC
+for R1P in results/trimmed_trimmomatic/vc/*_1P.fastq.gz; do
  R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
  SAMPLE=$(basename "$R1P" | sed 's/_1P\.fastq\.gz//')
  echo "[VC|Kraken2] $SAMPLE"
  kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
   --paired "$R1P" "$R2P" \
-  --report "results/kraken2_fastp/vc/${SAMPLE}.report" \
-  --output "results/kraken2_fastp/vc/${SAMPLE}.kraken" \
-   --quick --confidence 0.1 --memory-mapping --gzip-compressed
+  --report "results/kraken2_trimmomatic/vc/${SAMPLE}.report" \
+  --output "results/kraken2_trimmomatic/vc/${SAMPLE}.kraken" \
+  --quick --confidence 0.1 --memory-mapping --gzip-compressed
 done
+
 time2=$SECONDS
 echo "Elapsed time for kraken2 running on all samples: $(((time2 - time1)/60)) minutes!"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-echo "=== 6) Build KmerFinder databases (bacteria + all) ==="
-# Your commands, with light timing around them
-echo "Making KmerFinder bacterial database ..."
-t1=$SECONDS
-mkdir -p /scratch3/users/arash/Kmer_bacterial_database
-KmerFinder_DB="/scratch3/users/arash/Kmer_bacterial_database"
-cd /users/arash/tools/kmerfinder_db/
-bash INSTALL.sh "$KmerFinder_DB" bacteria latest
-t2=$SECONDS
-echo "Elapsed time for KmerFinder bacteria database: $((t2 - t1)) seconds!"
-
-echo "Making KmerFinder ALL database ..."
-t1=$SECONDS
-mkdir -p /scratch3/users/arash/Kmer_all_database
-KmerFinder_DB_ALL="/scratch3/users/arash/Kmer_all_database"
-cd /users/arash/tools/kmerfinder_db/
-bash INSTALL.sh "$KmerFinder_DB_ALL" all
-t2=$SECONDS
-echo "Elapsed time for KmerFinder all database: $((t2 - t1)) seconds!"
-cd - >/dev/null
-
-echo "=== 8) (Example) Run KmerFinder on FASTP-cleaned reads ==="
-# NOTE:
-#  - The exact CLI may vary (kmerfinder.py vs wrapper). Adjust as needed.
-#  - Many installations accept: kmerfinder.py -i "R1,R2" -db <DB> -o <OUTDIR>
-#  - We show bacteria DB for speed; switch to $KmerFinder_DB_ALL if you want everything.
-
-for R1P in results/trimmed_fastp/tb/*_1P.fastq.gz; do
-  [ -e "$R1P" ] || continue
-  R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
-  SAMPLE=$(basename "$R1P" | sed 's/_1P\.fastq\.gz//')
-  OUTDIR="results/kmerfinder/tb/${SAMPLE}"
-  mkdir -p "$OUTDIR"
-  echo "[TB|KmerFinder] $SAMPLE  ->  $OUTDIR"
-  # Replace 'kmerfinder.py' with the actual executable on your system if different
-  # Common pattern (adjust flags if your version differs):
-  kmerfinder.py -i "${R1P},${R2P}" -db "/scratch3/users/arash/Kmer_bacterial_database" -o "$OUTDIR" || true
-done
-
-for R1P in results/trimmed_fastp/vc/*_1P.fastq.gz; do
-  [ -e "$R1P" ] || continue
-  R2P=${R1P/_1P.fastq.gz/_2P.fastq.gz}
-  SAMPLE=$(basename "$R1P" | sed 's/_1P\.fastq\.gz//')
-  OUTDIR="results/kmerfinder/vc/${SAMPLE}"
-  mkdir -p "$OUTDIR"
-  echo "[VC|KmerFinder] $SAMPLE  ->  $OUTDIR"
-  kmerfinder.py -i "${R1P},${R2P}" -db "/scratch3/users/arash/Kmer_bacterial_database" -o "$OUTDIR" || true
-done
 
 echo
 echo "=== DONE ==="
@@ -237,5 +166,4 @@ echo "Open:"
 echo "  RAW MultiQC:                         results/qc_raw/tb/tb_multiqc_raw.html, results/qc_raw/vc/vc_multiqc_raw.html"
 echo "  TRIM (Trimmomatic) MultiQC:          results/qc_trim_trimmomatic/*/*.html"
 echo "  TRIM (fastp) MultiQC:                results/qc_trim_fastp/*/*.html"
-echo "  Kraken2 (fastp) reports:             results/kraken2_fastp/*/*.report"
-echo "  KmerFinder outputs:                  results/kmerfinder/*/* (per-sample folders)"
+echo "  Kraken2 (Trimmomatic) reports:             results/kraken2_trimmomatic/*/*.report"
