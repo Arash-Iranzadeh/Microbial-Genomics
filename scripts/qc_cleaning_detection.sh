@@ -47,7 +47,7 @@ echo "=== 2) Trimming with TRIMMOMATIC (saved in results/trimmed_trimmomatic) ==
 for R1 in ${TB_RAW}/*_1.fastq.gz; do
   [ -e "$R1" ] || continue
   R2=${R1/_1.fastq.gz/_2.fastq.gz}
-  SAMPLE=$(basename "$R1" ".fastq.gz")
+  SAMPLE=$(basename "$R1" "_1.fastq.gz")
   echo "[TB|Trimmomatic] $SAMPLE"
   trimmomatic PE -threads ${THREADS} -phred33 \
     "$R1" "$R2" \
@@ -60,7 +60,7 @@ done
 for R1 in ${VC_RAW}/*_1.fastq.gz; do
   [ -e "$R1" ] || continue
   R2=${R1/_1.fastq.gz/_2.fastq.gz}
-  SAMPLE=$(basename "$R1" ".fastq.gz")
+  SAMPLE=$(basename "$R1" "_1.fastq.gz")
   echo "[VC|Trimmomatic] $SAMPLE"
   trimmomatic PE -threads ${THREADS} -phred33 \
     "$R1" "$R2" \
@@ -76,7 +76,7 @@ echo "=== 3) Trimming with FASTP (saved in results/trimmed_fastp) ==="
 for R1 in ${TB_RAW}/*_1.fastq.gz; do
   [ -e "$R1" ] || continue
   R2=${R1/_1.fastq.gz/_2.fastq.gz}
-  SAMPLE=$(basename "$R1" ".fastq.gz")
+  SAMPLE=$(basename "$R1" "_1.fastq.gz")
   echo "[TB|fastp] $SAMPLE"
   ${FASTP} -w ${THREADS} \
     -i "$R1" -I "$R2" \
@@ -92,7 +92,7 @@ done
 for R1 in ${VC_RAW}/*_1.fastq.gz; do
   [ -e "$R1" ] || continue
   R2=${R1/_1.fastq.gz/_2.fastq.gz}
-  SAMPLE=$(basename "$R1" ".fastq.gz")
+  SAMPLE=$(basename "$R1" "_1.fastq.gz")
   echo "[VC|fastp] $SAMPLE"
   ${FASTP} -w ${THREADS} \
     -i "$R1" -I "$R2" \
