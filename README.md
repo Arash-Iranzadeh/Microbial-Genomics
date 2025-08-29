@@ -1,5 +1,5 @@
 # Microbial Genomics
-## University of Cape Town · 1 – 12 September 2025
+## University of Cape Town 1 – 12 September 2025
 
 This repository contains teaching materials for the **Microbial Genomics** workshop.
 
