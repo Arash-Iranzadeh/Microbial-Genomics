@@ -68,6 +68,8 @@ for R1 in ${VC_RAW}/*_1.fastq.gz; do
     "results/trimmed_trimmomatic/vc/${SAMPLE}_2P.fastq.gz" "results/trimmed_trimmomatic/vc/${SAMPLE}_2U.fastq.gz" \
     ILLUMINACLIP:"${ADAPT_COMBO}":2:30:10 SLIDINGWINDOW:4:20 LEADING:3 TRAILING:3 MINLEN:50
 done
+# To save soace, you can remove unpaired reads:
+rm ./results/trimmed_trimmomatic/*/*U*
 
 echo "=== 3) Trimming with FASTP (saved in results/trimmed_fastp) ==="
 # TB (length_required 50) + polyG/polyX trimming
