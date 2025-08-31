@@ -6,6 +6,8 @@
 # singularity build output_file.sif /ariba_v2.14.7.img
 # If sif file is used: ARIBA=singularity exec /path/to/ariba_v2.14.7.sif ariba
 # Aroba is a tool for MLST typing and antibiotic resistance genes identification.
+
+#Vibrio cholera
 module load singularity
 DATA_DIR="/scratch3/users/arash/Microbial-Genomics/results/trimmed_trimmomatic/vc"
 OUTPUT_DIR="/scratch3/users/arash/Microbial-Genomics/results/typing_amr"
@@ -50,9 +52,21 @@ done
 # Summarise data from several runs (in this case 3)
 ariba_cmd summary "${OUT_PREFIX}.summary" "${reports[@]}"
 cat "${OUT_PREFIX}.summary.csv"
+
+
 # View the results by dragging and dropping the files *.phandango.tre and *.phandango.csv into the Phandago:
 # https://jameshadfield.github.io/phandango/#/
+tb-profiler profile -1 ${sample_name}_1.fastq.gz -2 ${sample_name}_2.fastq.gz -p $sample_name -t 16 \
+  --spoligotype --txt --call_whole_genome --dir outputDir
+# The results from numerous runs can be collated into one table using the following command:
+tb-profiler collate
 
+
+ --prefix
+
+--spoligotype
+#Mycobacterium tuberculosis
+# https://github.com/jodyphelan/TBProfiler
 
 #instalation
 brew install brewsci/bio/mlst
