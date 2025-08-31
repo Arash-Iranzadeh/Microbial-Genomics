@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # https://github.com/sanger-pathogens/ariba
 # On PC: pip3 install ariba
 # On cluster:
