@@ -54,8 +54,6 @@ cat "${OUT_PREFIX}.summary.csv"
 # https://jameshadfield.github.io/phandango/#/
 
 
-
-
 #instalation
 brew install brewsci/bio/mlst
 
