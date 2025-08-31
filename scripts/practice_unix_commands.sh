@@ -1,47 +1,11 @@
+
+# ----------------------------------------------------------------------
+#To practice Unix commands in bash terminal
+#Definition: Git Bash is an application for Microsoft Windows that provides a Bash emulation layer.
+#It installs the Bash shell, common Unix utilities and Git on Window
+# ----------------------------------------------------------------------
+
 #!/bin/bash
-
-# ----------------------------------------------------------------------
-# practice_unix_commands.sh
-#
-# This script sets up a simple practice environment for learning basic
-# Unix command‑line tools.  It creates a working directory with some
-# example files and directories, then writes a set of instructions to
-# practice a range of commands covered in the supplied lecture slides.
-# The exercises include working with directories, viewing and editing
-# files, examining file permissions, copying, moving and deleting
-# files/directories, inspecting file contents, counting lines and
-# characters, sorting and deduplicating values, searching with grep,
-# cutting columns, performing in‑place edits with sed and writing
-# simple for‑loops.
-#
-# Usage:
-#   bash practice_unix_commands.sh
-#
-# The script is idempotent – running it multiple times will refresh
-# the practice environment.  It does not require root privileges.
-#
-# References:
-#   The commands in this practice script are drawn from a Unix
-#   overview.  For example, the slides describe how to print text
-#   with `echo` and `printf` and how to navigate directories with
-#   `pwd` and `cd`【126210253433624†L229-L239】.  They explain listing
-#   files with `ls` and its options【126210253433624†L241-L253】,
-#   viewing permissions and using `chmod`【126210253433624†L255-L333】,
-#   creating files with `cat` or `nano` and directories with `mkdir`
-#   【126210253433624†L334-L358】, copying and moving files with `cp` and
-#   `mv`【126210253433624†L360-L376】, removing files and directories
-#   with `rm` and `rmdir`【126210253433624†L378-L392】, inspecting file
-#   contents using `less`, `head`, `tail` and `cat`【126210253433624†L413-L426】,
-#   counting lines and words with `wc` and pipes【126210253433624†L428-L437】,
-#   redirecting output to a file【126210253433624†L440-L449】,
-#   sorting values with `sort`【126210253433624†L451-L466】 and
-#   extracting unique lines with `uniq`【126210253433624†L469-L477】,
-#   searching for patterns with `grep` and regular expressions
-#   【126210253433624†L478-L498】【126210253433624†L500-L519】,
-#   selecting columns with `cut`【126210253433624†L521-L535】,
-#   and replacing text using `sed`【126210253433624†L555-L571】.
-# ----------------------------------------------------------------------
-
 set -euo pipefail
 
 # Determine a base practice directory.  If the user has defined
@@ -130,7 +94,7 @@ This file provides a series of short exercises.  Open a terminal,
 navigate to your practice directory (it should be at ~/unix_practice
 unless you specified a custom location), then follow the tasks
 below.  Each section corresponds to topics covered in the lecture
-slides【126210253433624†L229-L239】.  Type the commands yourself and
+slides.  Type the commands yourself and
 observe the output to build familiarity with the shell.
 
 1. Printing text and variables
@@ -149,7 +113,7 @@ observe the output to build familiarity with the shell.
   ```
   Variable naming rules are summarised in the slides: names are
   case sensitive, no spaces around the equal sign, and you should
-  prefix a variable with `$` when reading it【126210253433624†L229-L239】.
+  prefix a variable with `$` when reading it.
 
 2. Navigating directories
 -------------------------
@@ -160,7 +124,7 @@ observe the output to build familiarity with the shell.
 • Change into the `data` directory you created and list its
   contents, then return to the parent directory.  Recall that `.`
   refers to the current directory, `..` to the parent and `~` to
-  your home【126210253433624†L229-L239】:
+  your home:
   ```sh
   cd data
   pwd
@@ -179,14 +143,14 @@ observe the output to build familiarity with the shell.
   ls data      # list contents of the data directory
   ls ..        # list contents of the parent directory
   ```
-  These options correspond to those described in the slides【126210253433624†L241-L253】.
+  These options correspond to those described in the slides.
 
 • Examine file permissions:
   ```sh
   ls -l data/fruit.txt
   ```
   The nine characters after the first dash represent read (r), write (w)
-  and execute (x) permissions for owner, group and others【126210253433624†L255-L271】.
+  and execute (x) permissions for owner, group and others.
 
 • Change permissions using `chmod`.  For example, give the
   executable permission to the owner on `fruit.txt`, then remove
@@ -201,7 +165,7 @@ observe the output to build familiarity with the shell.
   ls -l data/fruit.txt
   ```
   The letters `u`, `g`, `o` and `a` and the `+`/`-` operators follow
-  the format `chmod (ugoa)+/- file` described in the lecture【126210253433624†L308-L333】.
+  the format `chmod (ugoa)+/- file` described in the lecture.
 
 4. Creating files and directories
 --------------------------------
@@ -212,7 +176,7 @@ observe the output to build familiarity with the shell.
   ls -l
   ```
   The slides show how `mkdir path/to/directoryName` creates a new
-  directory and how multiple names can be provided【126210253433624†L334-L358】.
+  directory and how multiple names can be provided.
 
 • Create a new file using `cat`.  This command will wait for
   input.  Type some lines and finish with Ctrl‑D:
@@ -223,7 +187,7 @@ observe the output to build familiarity with the shell.
   Ctrl-D
   ```
   If you run `cat >> tmp/myfile.txt` the content will be appended
-  instead of overwritten【126210253433624†L334-L341】.
+  instead of overwritten.
 
 • Alternatively you can use a text editor such as `nano` to
   create or edit files.  Try:
@@ -231,7 +195,7 @@ observe the output to build familiarity with the shell.
   nano tmp/myfile.txt
   ```
   Then type some lines, press Ctrl‑X, then Y and Enter to save
-  changes.  Nano usage is covered in the slides【126210253433624†L346-L353】.
+  changes.  Nano usage is covered in the slides.
 
 5. Copying, moving and removing
 -------------------------------
@@ -241,7 +205,7 @@ observe the output to build familiarity with the shell.
   mv data/fruit_copy.txt data/fruit_backup.txt
   ```
   The `cp` command copies the contents of one file into another, and
-  `mv` moves or renames a file【126210253433624†L360-L376】.
+  `mv` moves or renames a file.
 
 • Copy and move directories in the same way:
   ```sh
@@ -251,7 +215,7 @@ observe the output to build familiarity with the shell.
   ```
 
 • Remove a file and a directory.  Be careful—`rm` permanently
-  deletes files【126210253433624†L378-L392】:
+  deletes files:
   ```sh
   rm data/fruit_backup.txt
   rm -r data/example_dir_moved
@@ -266,7 +230,7 @@ observe the output to build familiarity with the shell.
   less data/story.txt
   more data/story.txt
   ```
-  Use `q` to quit the viewer【126210253433624†L413-L417】.
+  Use `q` to quit the viewer.
 
 • Display the first and last few lines of a file with `head` and
   `tail`.  The `-n` option lets you specify how many lines to
@@ -278,7 +242,7 @@ observe the output to build familiarity with the shell.
   ```
 
 • Concatenate files using `cat`.  You can also print line numbers
-  with `cat -n`【126210253433624†L423-L426】:
+  with `cat -n`:
   ```sh
   cat data/fruit.txt
   cat -n data/story.txt
@@ -288,14 +252,14 @@ observe the output to build familiarity with the shell.
 7. Counting with wc and using pipes
 -----------------------------------
 • Count the number of lines, words and characters in a file using
-  `wc`【126210253433624†L428-L437】:
+  `wc`:
   ```sh
   wc data/story.txt
   wc -l data/story.txt
   ```
 
 • Use a pipe (`|`) to feed the output of one command into another.
-  For example, count the number of lines returned by `cat`【126210253433624†L434-L437】:
+  For example, count the number of lines returned by `cat`:
   ```sh
   cat data/story.txt | wc -l
   ```
@@ -303,7 +267,7 @@ observe the output to build familiarity with the shell.
 8. Redirecting output to a file
 -------------------------------
 • Use the `>` operator to write output into a file instead of the
-  terminal【126210253433624†L440-L449】:
+  terminal:
   ```sh
   cat data/fruit.txt data/numbers.txt > results/combined.txt
   head -n 3 data/story.txt > results/first3.txt
@@ -312,7 +276,7 @@ observe the output to build familiarity with the shell.
 9. Sorting and deduplicating values
 -----------------------------------
 • Sort the numbers and observe the difference between lexical and
-  numeric sorting【126210253433624†L451-L466】:
+  numeric sorting:
   ```sh
   sort data/numbers.txt     # lexical sort (1,10,11,2,3…)
   sort -n data/numbers.txt  # numeric sort
@@ -320,13 +284,13 @@ observe the output to build familiarity with the shell.
   ```
 
 • Sort by a specific column in a CSV file using `sort -t` to set the
-  delimiter and `-k` to choose the column【126210253433624†L451-L466】:
+  delimiter and `-k` to choose the column:
   ```sh
   sort -t',' -k3 data/people.csv
   sort -t',' -k3,3 -n data/people.csv    # numeric sort on column 3
   ```
 
-• Find unique lines with `uniq`.  The input must be sorted first【126210253433624†L469-L477】:
+• Find unique lines with `uniq`.  The input must be sorted first:
   ```sh
   sort data/fruit.txt | uniq
   sort data/fruit.txt | uniq -c      # prefix lines with counts
@@ -335,7 +299,7 @@ observe the output to build familiarity with the shell.
 
 10. Searching for patterns with grep
 ------------------------------------
-• Search for a simple pattern in a file【126210253433624†L478-L498】:
+• Search for a simple pattern in a file:
   ```sh
   grep "banana" data/fruit.txt
   grep "banana" data/fruit.txt data/story.txt
@@ -351,7 +315,7 @@ observe the output to build familiarity with the shell.
   grep -f data/patterns.txt data/story.txt  # patterns from file
   ```
 
-• Try regular expressions【126210253433624†L500-L519】:
+• Try regular expressions:
   ```sh
   grep "^Line" data/story.txt      # lines starting with 'Line'
   grep "\.txt$" -r .               # files ending with .txt in current tree
@@ -360,7 +324,7 @@ observe the output to build familiarity with the shell.
 
 11. Selecting columns with cut
 ------------------------------
-• Extract specific characters from each line【126210253433624†L521-L535】:
+• Extract specific characters from each line:
   ```sh
   cut -c 1 data/fruit.txt       # first character of each line
   cut -c 1,5 data/story.txt     # first and fifth characters
@@ -370,7 +334,7 @@ observe the output to build familiarity with the shell.
   ```
 
 • Extract tab‑delimited columns from a file (for CSV files, set the
-  delimiter using `-d`)【126210253433624†L536-L552】:
+  delimiter using `-d`):
   ```sh
   cut -d ',' -f 1 data/people.csv       # first column
   cut -d ',' -f 1,3 data/people.csv     # first and third columns
@@ -380,7 +344,7 @@ observe the output to build familiarity with the shell.
 
 12. Find and replace text with sed
 ----------------------------------
-• Use `sed` to replace occurrences of a word【126210253433624†L555-L571】:
+• Use `sed` to replace occurrences of a word:
   ```sh
   sed 's/apple/banana/1' data/fruit.txt    # replace first occurrence per line
   sed 's/apple/banana/2' data/fruit.txt    # replace second occurrence per line
@@ -392,7 +356,7 @@ observe the output to build familiarity with the shell.
 
 13. Searching for files
 -----------------------
-• Use `find` to search the directory tree【126210253433624†L394-L411】:
+• Use `find` to search the directory tree:
   ```sh
   find . -name '*.txt'        # find all .txt files
   find . -type d             # list directories recursively
