@@ -59,7 +59,7 @@ cat "${OUT_PREFIX}.summary.csv"
 tb-profiler profile -1 ${sample_name}_1.fastq.gz -2 ${sample_name}_2.fastq.gz -p $sample_name -t 16 \
   --spoligotype --txt --call_whole_genome --dir outputDir
 # The results from numerous runs can be collated into one table using the following command:
-tb-profiler collate
+tb-profiler collate -d outputDir/results/
 
 
  --prefix
