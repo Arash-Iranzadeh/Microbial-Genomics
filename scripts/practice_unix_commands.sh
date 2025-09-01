@@ -6,7 +6,7 @@
 # ----------------------------------------------------------------------
 
 #!/bin/bash
-set -euo pipefail
+#set -euo pipefail
 
 # Determine a base practice directory.  If the user has defined
 # \$PRACTICE_DIR we honour that, otherwise default to a directory
