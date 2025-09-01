@@ -47,11 +47,12 @@ multiqc results/qc_raw/vc -n vc_multiqc_raw.html -o results/qc_raw/vc
 
 # Data cleaning
 # for long read data use:
-Guppy: Oxford Nanopore's basecaller which also performs adapter trimming.
-Pychopper: A tool to trim and orient Nanopore cDNA reads.
-Filtlong: A tool that filters long reads by length and quality, allowing you to select the best reads for downstream analysis.
-MinIONQC and NanoPack: A set of tools for quality control and filtering of Nanopore data.
-SMRT Link: PacBio's official software for primary analysis (demultiplexing, adapter removal, Consensus Sequences (generation).
+# Guppy: Oxford Nanopore's basecaller which also performs adapter trimming.
+# Pychopper: A tool to trim and orient Nanopore cDNA reads.
+# Filtlong: A tool that filters long reads by length and quality, allowing you to select the best reads for downstream analysis.
+# MinIONQC and NanoPack: A set of tools for quality control and filtering of Nanopore data.
+# SMRT Link: PacBio's official software for primary analysis (demultiplexing, adapter removal, Consensus Sequences (generation).
+
 echo "=== 2) Trimming with TRIMMOMATIC (saved in results/trimmed_trimmomatic) ==="
 # TB (MINLEN 50)
 for R1 in ${TB_RAW}/*_1.fastq.gz; do
@@ -114,6 +115,7 @@ for R1 in ${VC_RAW}/*_1.fastq.gz; do
     -j "results/trimmed_fastp/vc/${SAMPLE}_fastp.json"
 done
 
+# Quality check after trimming again
 echo "=== 4) FastQC on TRIMMED reads + MultiQC (Trimmomatic vs fastp) ==="
 # Trimmomatic QC
 fastqc -t ${THREADS} -o results/qc_trim_trimmomatic/tb results/trimmed_trimmomatic/tb/*_1P.fastq.gz results/trimmed_trimmomatic/tb/*_2P.fastq.gz
