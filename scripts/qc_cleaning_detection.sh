@@ -33,6 +33,9 @@ mkdir -p results/qc_trim_trimmomatic/tb results/qc_trim_trimmomatic/vc
 mkdir -p results/qc_trim_fastp/tb results/qc_trim_fastp/vc
 mkdir -p results/kraken2_trimmomatic/tb results/kraken2_trimmomatic/vc
 
+# For long read data use longqc:
+https://github.com/yfukasawa/LongQC
+
 time1=$SECONDS
 echo "=== 1) FastQC on RAW reads + MultiQC ==="
 # TB
