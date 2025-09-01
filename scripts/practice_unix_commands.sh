@@ -1,18 +1,14 @@
-# Lines starts with # are just description, they are not command 
+# Lines starts with "#" are just description, they are not commands.
 # ----------------------------------------------------------------------
-#To practice Unix commands in bash terminal
+# To practice Unix commands in bash terminal
 # ----------------------------------------------------------------------
 
-#!/bin/bash
-
-# Determine a base practice directory.  
-echo "Setting up practice directory at unix_practice"
-mkdir -p "unix_practice"
+# Setting up practice directory at unix_practice"
+mkdir "unix_practice"
 cd "unix_practice"
 
 # Clean out any previous practice data to make the script idempotent.
-rm -rf data scripts results tmp
-mkdir -p data scripts results tmp
+mkdir data scripts results tmp
 
 # ----------------------------------------------------------------------
 # Create sample files for practicing commands
