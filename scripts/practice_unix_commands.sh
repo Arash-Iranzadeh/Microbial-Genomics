@@ -43,7 +43,7 @@ EOF_FRUIT
 
 # A file with unsorted numbers (as strings) to practise sorting with
 # lexical and numeric options.
-cat > data/numbers.txt <<'EOF_NUM'
+cat > data/numbers.txt 
 3
 11
 2
@@ -53,40 +53,40 @@ cat > data/numbers.txt <<'EOF_NUM'
 4
 2
 5
-EOF_NUM
+
 
 # A comma‑separated values file for practising cut and sort by
 # columns.  Tab separation is left as the default delimiter for cut.
-cat > data/people.csv <<'EOF_PEOPLE'
+cat > data/people.csv 
 id,name,age
 1,Alice,30
 2,Bob,25
 3,Carol,27
 4,Dave,25
 5,Eve,30
-EOF_PEOPLE
+
 
 # A small multi‑line text file to explore head, tail and wc
-cat > data/story.txt <<'EOF_STORY'
+cat > data/story.txt 
 Line one: Once upon a time there was a file.
 Line two: It contained multiple lines for testing.
 Line three: Some lines contain the word apple and banana.
 Line four: GREP should find both uppercase and lowercase.
 Line five: The end.
-EOF_STORY
+
 
 # Patterns file used with grep -f
-cat > data/patterns.txt <<'EOF_PATTERNS'
+cat > data/patterns.txt 
 apple
 banana
 Line
-EOF_PATTERNS
+
 
 # ----------------------------------------------------------------------
 # Create an instruction file for students
 # ----------------------------------------------------------------------
 
-cat > scripts/INSTRUCTIONS.txt <<'EOF_INSTR'
+cat > scripts/INSTRUCTIONS.txt 
 Practice exercises for basic Unix commands
 =========================================
 
