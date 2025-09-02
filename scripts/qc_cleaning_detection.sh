@@ -134,7 +134,7 @@ multiqc results/qc_trim_fastp/vc -n vc_multiqc_trimmed_fastp.html -o results/qc_
 # kraken2-build --download-library bacteria --threads ${THREADS} --db ./kraken2_db_bacteria
 # kraken2-build --build --threads ${THREADS} --db ./kraken2_db_bacteria
 
-KRAKEN_DB="/cbio/training/courses/2025/micmet-genomics/kraken2_db_standard"
+KRAKEN_DB="/data/kraken2_db_standard"
 # 5) Kraken2 on FASTP-cleaned reads (if DB available) ==="
 # TB
 for SAMPLE in $(cat tb_IDs); do
