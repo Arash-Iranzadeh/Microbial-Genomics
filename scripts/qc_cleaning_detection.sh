@@ -1,29 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # ===========================================
-# QC + Cleaning + Detection (simple & clear)
+# QC + Cleaning + Detection 
 # - FastQC + MultiQC (raw)
 # - Trimmomatic (trim) -> separate outputs
 # - fastp (trim)       -> separate outputs
-# - FastQC + MultiQC (trimmed by each tool)
-# - Build Kraken2 DBs (bacteria + standard)
+# - FastQC + MultiQC (on cleaned reads by each of trimmomatic and fastp)
+# - Build Kraken2 DBs 
 # - Kraken2 on cleaned reads
 # ===========================================
 
-module load fastqc multiqc trimmomatic kraken2
-FASTP="/cbio/training/courses/2025/micmet-genomics/fastp"
+module load fastqc multiqc trimmomatic fastp kraken2 
 THREADS=$(nproc)
 # Input locations
 TB_RAW="/cbio/training/courses/2025/micmet-genomics/Dataset_Mt_Vc/tb/raw_data"
 VC_RAW="/cbio/training/courses/2025/micmet-genomics/Dataset_Mt_Vc/vc/raw_data"
-
-# Trimmomatic adapters:
-# We combine all adapters
+# Trimmomatic adapters
 ADAPT_COMBO="/cbio/training/courses/2025/micmet-genomics/timmomatic_adapter_Combo.fa"
-mkdir -p "$(dirname "$ADAPT_COMBO")"
-if [ ! -s "$ADAPT_COMBO" ]; then
-  cat /software/bio/trimmomatic/0.39/adapters/* > "$ADAPT_COMBO"
-fi
 
 # Output folders
 mkdir -p results/qc_raw/tb results/qc_raw/vc
@@ -91,12 +84,11 @@ for R1 in ${TB_RAW}/*_1.fastq.gz; do
   echo "[TB|fastp] $SAMPLE"
   ${FASTP} -w ${THREADS} \
     -i "$R1" -I "$R2" \
-    -o "results/trimmed_fastp/tb/${SAMPLE}_1P.fastq.gz" \
-    -O "results/trimmed_fastp/tb/${SAMPLE}_2P.fastq.gz" \
+    -o "results/trimmed_fastp/tb/${SAMPLE}_1.fastq.gz" \
+    -O "results/trimmed_fastp/tb/${SAMPLE}_2.fastq.gz" \
     --detect_adapter_for_pe --trim_poly_g --trim_poly_x \
     --qualified_quality_phred 30 --length_required 50 \
-    -h "results/trimmed_fastp/tb/${SAMPLE}_fastp.html" \
-    -j "results/trimmed_fastp/tb/${SAMPLE}_fastp.json"
+    -h "results/trimmed_fastp/tb/${SAMPLE}_fastp.html" 
 done
 
 # VC (length_required 50) + polyG/polyX trimming
@@ -107,25 +99,24 @@ for R1 in ${VC_RAW}/*_1.fastq.gz; do
   echo "[VC|fastp] $SAMPLE"
   ${FASTP} -w ${THREADS} \
     -i "$R1" -I "$R2" \
-    -o "results/trimmed_fastp/vc/${SAMPLE}_1P.fastq.gz" \
-    -O "results/trimmed_fastp/vc/${SAMPLE}_2P.fastq.gz" \
+    -o "results/trimmed_fastp/vc/${SAMPLE}_1.fastq.gz" \
+    -O "results/trimmed_fastp/vc/${SAMPLE}_2.fastq.gz" \
     --detect_adapter_for_pe --trim_poly_g --trim_poly_x \
     --qualified_quality_phred 30 --length_required 50 \
-    -h "results/trimmed_fastp/vc/${SAMPLE}_fastp.html" \
-    -j "results/trimmed_fastp/vc/${SAMPLE}_fastp.json"
+    -h "results/trimmed_fastp/vc/${SAMPLE}_fastp.html" 
 done
 
 # Quality check after trimming again
 echo "=== 4) FastQC on TRIMMED reads + MultiQC (Trimmomatic vs fastp) ==="
 # Trimmomatic QC
-fastqc -t ${THREADS} -o results/qc_trim_trimmomatic/tb results/trimmed_trimmomatic/tb/*_1P.fastq.gz results/trimmed_trimmomatic/tb/*_2P.fastq.gz
-fastqc -t ${THREADS} -o results/qc_trim_trimmomatic/vc results/trimmed_trimmomatic/vc/*_1P.fastq.gz results/trimmed_trimmomatic/vc/*_2P.fastq.gz
+fastqc -t ${THREADS} -o results/qc_trim_trimmomatic/tb results/trimmed_trimmomatic/tb/*_1.fastq.gz results/trimmed_trimmomatic/tb/*_2.fastq.gz
+fastqc -t ${THREADS} -o results/qc_trim_trimmomatic/vc results/trimmed_trimmomatic/vc/*_1.fastq.gz results/trimmed_trimmomatic/vc/*_2.fastq.gz
 multiqc results/qc_trim_trimmomatic/tb -n tb_multiqc_trimmed_trimmomatic.html -o results/qc_trim_trimmomatic/tb
 multiqc results/qc_trim_trimmomatic/vc -n vc_multiqc_trimmed_trimmomatic.html -o results/qc_trim_trimmomatic/vc
 
 # fastp QC
-fastqc -t ${THREADS} -o results/qc_trim_fastp/tb results/trimmed_fastp/tb/*_1P.fastq.gz results/trimmed_fastp/tb/*_2P.fastq.gz
-fastqc -t ${THREADS} -o results/qc_trim_fastp/vc results/trimmed_fastp/vc/*_1P.fastq.gz results/trimmed_fastp/vc/*_2P.fastq.gz
+fastqc -t ${THREADS} -o results/qc_trim_fastp/tb results/trimmed_fastp/tb/*_1.fastq.gz results/trimmed_fastp/tb/*_2.fastq.gz
+fastqc -t ${THREADS} -o results/qc_trim_fastp/vc results/trimmed_fastp/vc/*_1.fastq.gz results/trimmed_fastp/vc/*_2.fastq.gz
 multiqc results/qc_trim_fastp/tb -n tb_multiqc_trimmed_fastp.html -o results/qc_trim_fastp/tb
 multiqc results/qc_trim_fastp/vc -n vc_multiqc_trimmed_fastp.html -o results/qc_trim_fastp/vc
 
