@@ -9,7 +9,7 @@ set -euo pipefail
 # - Build Kraken2 DBs 
 # - Kraken2 on cleaned reads
 # ===========================================
-
+srun --cpus-per-task=8 --mem=32GB  --pty bash
 module load fastqc multiqc trimmomatic fastp kraken2 
 THREADS=$(nproc)
 # Input locations
