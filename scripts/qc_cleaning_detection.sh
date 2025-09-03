@@ -18,8 +18,8 @@ VC_RAW="/data/Dataset_Mt_Vc/vc/raw_data"
 # Trimmomatic adapters
 ADAPT_COMBO="/data/timmomatic_adapter_Combo.fa"
 # saving sample IDs
-ls ${TB_RAW} | cut -f1 -d '_'  | sort | uniq > tb_IDs
-ls ${VC_RAW} | cut -f1 -d '_'  | sort | uniq > vc_IDs
+ls ${TB_RAW} | cut -f1 -d '_'  | sort | uniq > data_analysis/tb_IDs
+ls ${VC_RAW} | cut -f1 -d '_'  | sort | uniq > data_analysis/vc_IDs
 
 # Output folders
 mkdir -p data_analysis/qc_raw/tb data_analysis/qc_raw/vc
@@ -55,7 +55,7 @@ multiqc data_analysis/qc_raw/vc -n vc_multiqc_raw.html -o data_analysis/qc_raw/v
 
 # 2) Cleaning with TRIMMOMATIC 
 # TB (MINLEN 50)
-for SAMPLE in $(cat tb_IDs); do
+for SAMPLE in $(cat data_analysis/tb_IDs); do
   echo "[TB|Trimmomatic] $SAMPLE"
   trimmomatic PE -threads ${THREADS} -phred33 \
     ${TB_RAW}/${SAMPLE}_1.fastq.gz ${TB_RAW}/${SAMPLE}_2.fastq.gz  \
@@ -65,7 +65,7 @@ for SAMPLE in $(cat tb_IDs); do
 done
 
 # VC (MINLEN 50)
-for SAMPLE in $(cat vc_IDs); do
+for SAMPLE in $(cat data_analysis/vc_IDs); do
   trimmomatic PE -threads ${THREADS} -phred33 \
     ${VC_RAW}/${SAMPLE}_1.fastq.gz ${VC_RAW}/${SAMPLE}_2.fastq.gz  \
     "data_analysis/trimmed_trimmomatic/vc/${SAMPLE}_1.fastq.gz" "data_analysis/trimmed_trimmomatic/vc/${SAMPLE}_1U.fastq.gz" \
@@ -89,7 +89,7 @@ multiqc data_analysis/qc_trim_trimmomatic/vc -n vc_multiqc_trimmed_trimmomatic.h
 
 # Cleaning by fastp (optional)
 # TB (length_required 50) + polyG/polyX trimming
-for SAMPLE in $(cat tb_IDs); do
+for SAMPLE in $(cat data_analysis/tb_IDs); do
   echo "[TB|fastp] ${SAMPLE}"
   fastp -w ${THREADS} \
     -i ${TB_RAW}/${SAMPLE}_1.fastq.gz  -I ${TB_RAW}/${SAMPLE}_2.fastq.gz \
@@ -101,7 +101,7 @@ for SAMPLE in $(cat tb_IDs); do
 done
 
 # VC (length_required 50) + polyG/polyX trimming
-for SAMPLE in $(cat vc_IDs); do
+for SAMPLE in $(cat data_analysis/vc_IDs); do
   echo "[VC|fastp] ${SAMPLE}"
   fastp -w ${THREADS} \
     -i ${VC_RAW}/${SAMPLE}_1.fastq.gz  -I ${VC_RAW}/${SAMPLE}_2.fastq.gz \
@@ -137,7 +137,7 @@ multiqc data_analysis/qc_trim_fastp/vc -n vc_multiqc_trimmed_fastp.html -o data_
 KRAKEN_DB="/data/kraken2_db_standard"
 # 5) Kraken2 on FASTP-cleaned reads (if DB available) ==="
 # TB
-for SAMPLE in $(cat tb_IDs); do
+for SAMPLE in $(cat data_analysis/tb_IDs); do
  kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
     --quick --confidence 0.1 --memory-mapping --gzip-compressed --use-names \
     --paired ./data_analysis/trimmed_trimmomatic/tb/${SAMPLE}_1.fastq.gz ./data_analysis/trimmed_trimmomatic/tb/${SAMPLE}_2.fastq.gz \
@@ -146,7 +146,7 @@ for SAMPLE in $(cat tb_IDs); do
 done
 
 # VC
-for SAMPLE in $(cat vc_IDs); do
+for SAMPLE in $(cat data_analysis/vc_IDs); do
  kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
   --quick --confidence 0.1 --memory-mapping --gzip-compressed --use-names \
   --paired /data_analysis/trimmed_trimmomatic/vc/${SAMPLE}_1.fastq.gz ./data_analysis/trimmed_trimmomatic/vc/${SAMPLE}_2.fastq.gz \
