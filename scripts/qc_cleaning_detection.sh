@@ -10,7 +10,7 @@ set -euo pipefail
 # - Kraken2 on cleaned reads
 # ===========================================
 # Quality check for long read data use longqc:
-https://github.com/yfukasawa/LongQC
+# https://github.com/yfukasawa/LongQC
 # Data cleaning for long read data use:
 # Guppy: Oxford Nanopore's basecaller which also performs adapter trimming.
 # Pychopper: A tool to trim and orient Nanopore cDNA reads.
@@ -18,7 +18,11 @@ https://github.com/yfukasawa/LongQC
 # MinIONQC and NanoPack: A set of tools for quality control and filtering of Nanopore data.
 # SMRT Link: PacBio's official software for primary analysis (demultiplexing, adapter removal, Consensus Sequences (generation).
 
+# Run the command below before starting the analysis
 srun --cpus-per-task=8 --mem=32GB  --pty bash
+
+
+module load fastqc fastp multiqc trimmomatic kraken2 
 OUTPUT_DIR="/data/users/user28/data_analysis"
 THREADS=$(nproc)
 # Input locations
@@ -33,6 +37,10 @@ mkdir -p ${OUTPUT_DIR}/trimmed_fastp/tb ${OUTPUT_DIR}/trimmed_fastp/vc
 mkdir -p ${OUTPUT_DIR}/qc_trim_trimmomatic/tb ${OUTPUT_DIR}/qc_trim_trimmomatic/vc
 mkdir -p ${OUTPUT_DIR}/qc_trim_fastp/tb ${OUTPUT_DIR}/qc_trim_fastp/vc
 mkdir -p ${OUTPUT_DIR}/kraken2_trimmomatic/tb ${OUTPUT_DIR}/kraken2_trimmomatic/vc
+
+ls ${TB_RAW} | cut -f1 -d '_' | sort | uniq > ${OUTPUT_DIR}/tb_IDs
+ls ${VC_RAW} | cut -f1 -d '_' | sort | uniq > ${OUTPUT_DIR}/vc_IDs
+
 
 # TB
 # 1) FastQC on RAW reads + MultiQC ==="
