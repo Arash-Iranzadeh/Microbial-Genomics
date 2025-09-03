@@ -18,6 +18,7 @@ VC_RAW="/data/Dataset_Mt_Vc/vc/raw_data"
 # Trimmomatic adapters
 ADAPT_COMBO="/data/timmomatic_adapter_Combo.fa"
 # saving sample IDs
+mkdir -p data_analysis
 ls ${TB_RAW} | cut -f1 -d '_'  | sort | uniq > data_analysis/tb_IDs
 ls ${VC_RAW} | cut -f1 -d '_'  | sort | uniq > data_analysis/vc_IDs
 
