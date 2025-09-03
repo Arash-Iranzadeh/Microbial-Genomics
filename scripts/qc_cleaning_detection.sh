@@ -142,8 +142,7 @@ for SAMPLE in $(cat ${OUTPUT_DIR}/vc_IDs); do
   --output "${OUTPUT_DIR}/kraken2_trimmomatic/vc/${SAMPLE}.kraken"
   done
 
-# To summarize kraken resukts:
-
+# To summarize kraken resukts use summarize_kraken.sh
 
 # to visualize the kraken data_analysis use Pavian that is an R/Shiny application. 
 # Install R and RStudio. Install Pavian dependencies: Open R and run the following commands.
