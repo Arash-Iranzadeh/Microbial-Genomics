@@ -1,3 +1,7 @@
+set -euo pipefail
+
+srun --cpus-per-task=16 --mem=64GB --time 3:00:00 --pty bash
+
 module purge
 module load spades/4.2.0
 OUTPUT_DIR="/data/users/${USER}/data_analysis"
@@ -18,7 +22,6 @@ for SAMPLE in $(cat $OUTPUT_DIR/tb_IDs); do
   spades.py -1 ${TB_CLEAN}/${SAMPLE}_1.fastq.gz -2 ${TB_CLEAN}/${SAMPLE}_2.fastq.gz \
   --careful -t ${THREADS} --cov-cutoff "auto" -o ${OUTPUT_DIR}/assembly/tb/${SAMPLE}
 done
-
 
 module load anaconda3/2024.10
 conda activate prokka
