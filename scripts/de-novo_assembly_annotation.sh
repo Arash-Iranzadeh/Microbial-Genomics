@@ -1,6 +1,6 @@
 set -euo pipefail
 
-srun --cpus-per-task=16 --mem=64GB --time 3:00:00 --pty bash
+srun --cpus-per-task=8 --mem=32GB --time 3:00:00 --pty bash
 
 module purge
 module load spades/4.2.0 bedtools
