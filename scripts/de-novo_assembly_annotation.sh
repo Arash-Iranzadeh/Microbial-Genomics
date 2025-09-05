@@ -3,7 +3,7 @@ set -euo pipefail
 srun --cpus-per-task=16 --mem=64GB --time 3:00:00 --pty bash
 
 module purge
-module load spades/4.2.0
+module load spades/4.2.0 bedtools
 OUTPUT_DIR="/data/users/${USER}/data_analysis"
 THREADS=$(nproc)
 
@@ -42,6 +42,16 @@ for S in $SAMPLES; do
   rrna=$(grep -P "\trRNA\t" "$GFF" | wc -l)
   echo -e "${S}\tCDS:${cds}\ttRNA:${trna}\trRNA:${rrna}"
 done
+
+# Count the total number of features in a GFF file
+grep -v "^#" your.gff | cut -f 3 | sort | uniq -c
+
+# Calculating feature length statistics
+grep -v "^#" your.gff | awk '$3 == "exon"' | awk '{print $5-$4}' | awk '{sum+=$1} END {print sum/NR}'
+
+# Summarizing feature lengths by type
+grep -v "^#" your.gff | awk '{print $1"\t"$4"\t"$5"\t"$3}' | bedtools sort -i - | bedtools groupBy -i - -c 4 -o count
+
 
 
 
