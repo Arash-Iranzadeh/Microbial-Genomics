@@ -1,29 +1,20 @@
 #!/usr/bin/env bash
+
+#SBATCH --job-name="QC_Cleaning"
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=128GB
+#SBATCH --output=${HOME}/logs/QC_cleaning_out.log
+#SBATCH --error=${HOME}/logs/QC_cleaning_err.log
+#SBATCH --time=24:00:00
+
+# If you want interactive jobs:
+# srun --cpus-per-task=8 --mem=32GB  --pty bash
+
 set -euo pipefail
-# ===========================================
-# QC + Cleaning + Detection 
-# - FastQC + MultiQC (raw)
-# - Trimmomatic (trim) -> separate outputs
-# - fastp (trim)       -> separate outputs
-# - FastQC + MultiQC (on cleaned reads by each of trimmomatic and fastp)
-# - Build Kraken2 DBs 
-# - Kraken2 on cleaned reads
-# ===========================================
-# Quality check for long read data use longqc:
-# https://github.com/yfukasawa/LongQC
-# Data cleaning for long read data use:
-# Guppy: Oxford Nanopore's basecaller which also performs adapter trimming.
-# Pychopper: A tool to trim and orient Nanopore cDNA reads.
-# Filtlong: A tool that filters long reads by length and quality, allowing you to select the best reads for downstream analysis.
-# MinIONQC and NanoPack: A set of tools for quality control and filtering of Nanopore data.
-# SMRT Link: PacBio's official software for primary analysis (demultiplexing, adapter removal, Consensus Sequences (generation).
 
-# Run the command below before starting the analysis
-srun --cpus-per-task=8 --mem=32GB  --pty bash
-
-
+mkdir -p ${HOME}/logs
 module load fastqc fastp multiqc trimmomatic kraken2 
-OUTPUT_DIR="/data/users/user28/data_analysis"
+OUTPUT_DIR="/data/users/${USER}/data_analysis"
 THREADS=$(nproc)
 # Input locations
 TB_RAW="/data/Dataset_Mt_Vc/tb/raw_data"
@@ -41,13 +32,12 @@ mkdir -p ${OUTPUT_DIR}/kraken2_trimmomatic/tb ${OUTPUT_DIR}/kraken2_trimmomatic/
 ls ${TB_RAW} | cut -f1 -d '_' | sort | uniq > ${OUTPUT_DIR}/tb_IDs
 ls ${VC_RAW} | cut -f1 -d '_' | sort | uniq > ${OUTPUT_DIR}/vc_IDs
 
-
 # TB
-# 1) FastQC on RAW reads + MultiQC ==="
+echo "1) FastQC + MultiQC on raw data / TB ..."
 fastqc -t ${THREADS} -o ${OUTPUT_DIR}/qc_raw/tb ${TB_RAW}/*_1.fastq.gz ${TB_RAW}/*_2.fastq.gz
 multiqc ${OUTPUT_DIR}/qc_raw/tb -n tb_multiqc_raw.html -o ${OUTPUT_DIR}/qc_raw/tb
 
-# 2) Cleaning with TRIMMOMATIC 
+echo "2) Cleaning with Trimmomatic / TB ..." 
 # TB (MINLEN 50)
 for SAMPLE in $(cat ${OUTPUT_DIR}/tb_IDs); do
   echo "[TB|Trimmomatic] $SAMPLE"
@@ -58,11 +48,11 @@ for SAMPLE in $(cat ${OUTPUT_DIR}/tb_IDs); do
     ILLUMINACLIP:"${ADAPT_COMBO}":2:30:10 SLIDINGWINDOW:4:20 LEADING:3 TRAILING:3 MINLEN:50
 done
 
-# 3) QC after cleaning by trimmomatic
+echo "3) QC after cleaning by Trimmomatic / TB ..."
 fastqc -t ${THREADS} -o ${OUTPUT_DIR}/qc_trim_trimmomatic/tb ${OUTPUT_DIR}/trimmed_trimmomatic/tb/*_1.fastq.gz ${OUTPUT_DIR}/trimmed_trimmomatic/tb/*_2.fastq.gz
 multiqc ${OUTPUT_DIR}/qc_trim_trimmomatic/tb -n tb_multiqc_trimmed_trimmomatic.html -o ${OUTPUT_DIR}/qc_trim_trimmomatic/tb
 
-# 4) Cleaning with fastp
+echo "4) Cleaning with Fastp / TB ..."
 # TB (length_required 50) + polyG/polyX trimming
 for SAMPLE in $(cat ${OUTPUT_DIR}/tb_IDs); do
   echo "[TB|fastp] ${SAMPLE}"
@@ -75,16 +65,16 @@ for SAMPLE in $(cat ${OUTPUT_DIR}/tb_IDs); do
     -h "${OUTPUT_DIR}/trimmed_fastp/tb/${SAMPLE}_fastp.html" 
 done
 
-# 5) QC after cleaning with fastp
+echo "5) QC after cleaning with fastp / TB ..."
 fastqc -t ${THREADS} -o ${OUTPUT_DIR}/qc_trim_fastp/tb ${OUTPUT_DIR}/trimmed_fastp/tb/*_1.fastq.gz ${OUTPUT_DIR}/trimmed_fastp/tb/*_2.fastq.gz
 multiqc ${OUTPUT_DIR}/qc_trim_fastp/tb -n tb_multiqc_trimmed_fastp.html -o ${OUTPUT_DIR}/qc_trim_fastp/tb
 
 # VC
-# 1) FastQC on RAW reads + MultiQC ==="
+echo "1) FastQC + MultiQC on raw reads / VC ..."
 fastqc -t ${THREADS} -o ${OUTPUT_DIR}/qc_raw/vc ${VC_RAW}/*_1.fastq.gz ${VC_RAW}/*_2.fastq.gz
 multiqc ${OUTPUT_DIR}/qc_raw/vc -n vc_multiqc_raw.html -o ${OUTPUT_DIR}/qc_raw/vc
 
-# 2) Cleaning with trimmomatic
+echo "2) Cleaning with trimmomatic / VC ..."
 # VC (MINLEN 50)
 for SAMPLE in $(cat ${OUTPUT_DIR}/vc_IDs); do
   trimmomatic PE -threads ${THREADS} -phred33 \
@@ -94,11 +84,11 @@ for SAMPLE in $(cat ${OUTPUT_DIR}/vc_IDs); do
     ILLUMINACLIP:"${ADAPT_COMBO}":2:30:10 SLIDINGWINDOW:4:20 LEADING:3 TRAILING:3 MINLEN:50
 done
 
-# 3) QC after cleaning with trimmomatic
+echo "3) QC after cleaning with Trimmomatic / VC ..."
 fastqc -t ${THREADS} -o ${OUTPUT_DIR}/qc_trim_trimmomatic/vc ${OUTPUT_DIR}/trimmed_trimmomatic/vc/*_1.fastq.gz ${OUTPUT_DIR}/trimmed_trimmomatic/vc/*_2.fastq.gz
 multiqc ${OUTPUT_DIR}/qc_trim_trimmomatic/vc -n vc_multiqc_trimmed_trimmomatic.html -o ${OUTPUT_DIR}/qc_trim_trimmomatic/vc
 
-# 4) Cleaning with fastp
+echo "4) Cleaning with Fastp / VC ..."
 # VC (length_required 50) + polyG/polyX trimming
 for SAMPLE in $(cat ${OUTPUT_DIR}/vc_IDs); do
   echo "[VC|fastp] ${SAMPLE}"
@@ -111,7 +101,7 @@ for SAMPLE in $(cat ${OUTPUT_DIR}/vc_IDs); do
     -h "${OUTPUT_DIR}/trimmed_fastp/vc/${SAMPLE}_fastp.html" 
 done
 
-# QC after cleaning with fastp
+echo "5) QC after cleaning with Fastp / VC ..."
 fastqc -t ${THREADS} -o ${OUTPUT_DIR}/qc_trim_fastp/vc ${OUTPUT_DIR}/trimmed_fastp/vc/*_1.fastq.gz ${OUTPUT_DIR}/trimmed_fastp/vc/*_2.fastq.gz
 multiqc ${OUTPUT_DIR}/qc_trim_fastp/vc -n vc_multiqc_trimmed_fastp.html -o ${OUTPUT_DIR}/qc_trim_fastp/vc
 
@@ -133,6 +123,7 @@ rm ./${OUTPUT_DIR}/trimmed_trimmomatic/*/*U*
 KRAKEN_DB="/data/kraken2_db_standard"
 # Kraken2 on trimmomatic-cleaned reads (if DB available) ==="
 # TB
+echo "1) Running Kraken / TB ..."
 for SAMPLE in $(cat ${OUTPUT_DIR}/tb_IDs); do
  kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
     --quick --confidence 0.1 --memory-mapping --gzip-compressed --use-names \
@@ -142,26 +133,26 @@ for SAMPLE in $(cat ${OUTPUT_DIR}/tb_IDs); do
 done
 
 # VC
+echo "2) Running Kraken / VC ..."
 for SAMPLE in $(cat ${OUTPUT_DIR}/vc_IDs); do
  kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
   --quick --confidence 0.1 --memory-mapping --gzip-compressed --use-names \
-  --paired /${OUTPUT_DIR}/trimmed_trimmomatic/vc/${SAMPLE}_1.fastq.gz ./${OUTPUT_DIR}/trimmed_trimmomatic/vc/${SAMPLE}_2.fastq.gz \
+  --paired ${OUTPUT_DIR}/trimmed_trimmomatic/vc/${SAMPLE}_1.fastq.gz ${OUTPUT_DIR}/trimmed_trimmomatic/vc/${SAMPLE}_2.fastq.gz \
   --report "${OUTPUT_DIR}/kraken2_trimmomatic/vc/${SAMPLE}.report" \
   --output "${OUTPUT_DIR}/kraken2_trimmomatic/vc/${SAMPLE}.kraken"
   done
 
 # To summarize kraken resukts use summarize_kraken.sh
-
 # to visualize the kraken data_analysis use Pavian that is an R/Shiny application. 
 # Install R and RStudio. Install Pavian dependencies: Open R and run the following commands.
-if (!require(remotes)) {
-    install.packages("remotes")
-}
-remotes::install_github("fbreitwieser/pavian")
+#if (!require(remotes)) {
+#    install.packages("remotes")
+#}
+#remotes::install_github("fbreitwieser/pavian")
 
 # Run Pavian: In R type
 
-library(pavian)
-pavian::runApp(port=5000)
+#library(pavian)
+#pavian::runApp(port=5000)
 
-This will start a web server and print the address in the console. Paste this address into your web browser to use the application. 
+#This will start a web server and print the address in the console. Paste this address into your web browser to use the application. 
