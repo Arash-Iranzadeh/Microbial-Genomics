@@ -77,6 +77,7 @@ multiqc ${OUTPUT_DIR}/qc_raw/vc -n vc_multiqc_raw.html -o ${OUTPUT_DIR}/qc_raw/v
 echo "2) Cleaning with trimmomatic / VC ..."
 # VC (MINLEN 50)
 for SAMPLE in $(cat ${OUTPUT_DIR}/vc_IDs); do
+  echo "[VC|Trimmomatic] $SAMPLE"
   trimmomatic PE -threads ${THREADS} -phred33 \
     ${VC_RAW}/${SAMPLE}_1.fastq.gz ${VC_RAW}/${SAMPLE}_2.fastq.gz  \
     "${OUTPUT_DIR}/trimmed_trimmomatic/vc/${SAMPLE}_1.fastq.gz" "${OUTPUT_DIR}/trimmed_trimmomatic/vc/${SAMPLE}_1U.fastq.gz" \
