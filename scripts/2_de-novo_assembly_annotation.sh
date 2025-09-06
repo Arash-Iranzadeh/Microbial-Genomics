@@ -40,6 +40,8 @@ done
 
 conda deactivate
 
+module purge
+module load spades/4.2.0
 # VC
 echo "1) Genome assembly / VC ..."
 for SAMPLE in $(cat $OUTPUT_DIR/vc_IDs); do
