@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --job-name="QC_Cleaning"
+#SBATCH --job-name="QC_Cleaning_Detection"
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=128GB
 #SBATCH --output=./logs/QC_cleaning_out.log
@@ -106,7 +106,7 @@ fastqc -t ${THREADS} -o ${OUTPUT_DIR}/qc_trim_fastp/vc ${OUTPUT_DIR}/trimmed_fas
 multiqc ${OUTPUT_DIR}/qc_trim_fastp/vc -n vc_multiqc_trimmed_fastp.html -o ${OUTPUT_DIR}/qc_trim_fastp/vc
 
 # you can remove unpaired reads to save space:
-rm ./${OUTPUT_DIR}/trimmed_trimmomatic/*/*U*
+rm ${OUTPUT_DIR}/trimmed_trimmomatic/*/*U*
 
 # ===========================================
 # DB BUILDING + DETECTION
@@ -127,7 +127,7 @@ echo "1) Running Kraken / TB ..."
 for SAMPLE in $(cat ${OUTPUT_DIR}/tb_IDs); do
  kraken2 --db "$KRAKEN_DB" --threads ${THREADS} \
     --quick --confidence 0.1 --memory-mapping --gzip-compressed --use-names \
-    --paired ./${OUTPUT_DIR}/trimmed_trimmomatic/tb/${SAMPLE}_1.fastq.gz ./${OUTPUT_DIR}/trimmed_trimmomatic/tb/${SAMPLE}_2.fastq.gz \
+    --paired ${OUTPUT_DIR}/trimmed_trimmomatic/tb/${SAMPLE}_1.fastq.gz ${OUTPUT_DIR}/trimmed_trimmomatic/tb/${SAMPLE}_2.fastq.gz \
     --report "${OUTPUT_DIR}/kraken2_trimmomatic/tb/${SAMPLE}.report" \
     --output "${OUTPUT_DIR}/kraken2_trimmomatic/tb/${SAMPLE}.kraken"
 done
