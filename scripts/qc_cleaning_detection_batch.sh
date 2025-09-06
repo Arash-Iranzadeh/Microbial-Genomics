@@ -3,8 +3,8 @@
 #SBATCH --job-name="QC_Cleaning"
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=128GB
-#SBATCH --output=${HOME}/logs/QC_cleaning_out.log
-#SBATCH --error=${HOME}/logs/QC_cleaning_err.log
+#SBATCH --output=./logs/QC_cleaning_out.log
+#SBATCH --error=./logs/QC_cleaning_err.log
 #SBATCH --time=24:00:00
 
 # If you want interactive jobs:
@@ -12,7 +12,6 @@
 
 set -euo pipefail
 
-mkdir -p ${HOME}/logs
 module load fastqc fastp multiqc trimmomatic kraken2 
 OUTPUT_DIR="/data/users/${USER}/data_analysis"
 THREADS=$(nproc)
