@@ -25,7 +25,7 @@ ls $VC_CLEAN | cut -f1 -d '_' | sort | uniq > $OUTPUT_DIR/vc_IDs
 echo "1) Genome assembly / TB ..."
 for SAMPLE in $(cat $OUTPUT_DIR/tb_IDs); do
   spades.py -1 ${TB_CLEAN}/${SAMPLE}_1.fastq.gz -2 ${TB_CLEAN}/${SAMPLE}_2.fastq.gz \
-  --careful -t ${THREADS} --cov-cutoff "auto" -o ${OUTPUT_DIR}/assembly/tb/${SAMPLE}
+  --isolate -t ${THREADS} --cov-cutoff "auto" -o ${OUTPUT_DIR}/assembly/tb/${SAMPLE}
 done
 
 module load anaconda3/2024.10
@@ -46,7 +46,7 @@ module load spades/4.2.0
 echo "1) Genome assembly / VC ..."
 for SAMPLE in $(cat $OUTPUT_DIR/vc_IDs); do
   spades.py -1 ${VC_CLEAN}/${SAMPLE}_1.fastq.gz -2 ${VC_CLEAN}/${SAMPLE}_2.fastq.gz \
-  --careful -t ${THREADS} --cov-cutoff "auto" -o ${OUTPUT_DIR}/assembly/vc/${SAMPLE}
+  --isolate -t ${THREADS} --cov-cutoff "auto" -o ${OUTPUT_DIR}/assembly/vc/${SAMPLE}
 done
 
 module load anaconda3/2024.10
