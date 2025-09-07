@@ -34,7 +34,7 @@ ls ${VC_RAW} | cut -f1 -d '_' | sort | uniq > ${OUTPUT_DIR}/vc_IDs
 # TB
 echo "1) FastQC + MultiQC on raw data / TB ..."
 fastqc -t ${THREADS} -o ${OUTPUT_DIR}/qc_raw/tb ${TB_RAW}/*_1.fastq.gz ${TB_RAW}/*_2.fastq.gz
-multiqc ${OUTPUT_DIR}/qc_raw/tb -n tb_multiqc_raw.html -o ${OUTPUT_DIR}/qc_raw/tb
+multiqc ${OUTPUT_DIR}/qc_raw/tb --force -n tb_multiqc_raw.html -o ${OUTPUT_DIR}/qc_raw/tb
 
 echo "2) Cleaning with Trimmomatic / TB ..." 
 # TB (MINLEN 50)
@@ -49,7 +49,7 @@ done
 
 echo "3) QC after cleaning by Trimmomatic / TB ..."
 fastqc -t ${THREADS} -o ${OUTPUT_DIR}/qc_trim_trimmomatic/tb ${OUTPUT_DIR}/trimmed_trimmomatic/tb/*_1.fastq.gz ${OUTPUT_DIR}/trimmed_trimmomatic/tb/*_2.fastq.gz
-multiqc ${OUTPUT_DIR}/qc_trim_trimmomatic/tb -n tb_multiqc_trimmed_trimmomatic.html -o ${OUTPUT_DIR}/qc_trim_trimmomatic/tb
+multiqc ${OUTPUT_DIR}/qc_trim_trimmomatic/tb --force -n tb_multiqc_trimmed_trimmomatic.html -o ${OUTPUT_DIR}/qc_trim_trimmomatic/tb
 
 echo "4) Cleaning with Fastp / TB ..."
 # TB (length_required 50) + polyG/polyX trimming
@@ -66,12 +66,12 @@ done
 
 echo "5) QC after cleaning with fastp / TB ..."
 fastqc -t ${THREADS} -o ${OUTPUT_DIR}/qc_trim_fastp/tb ${OUTPUT_DIR}/trimmed_fastp/tb/*_1.fastq.gz ${OUTPUT_DIR}/trimmed_fastp/tb/*_2.fastq.gz
-multiqc ${OUTPUT_DIR}/qc_trim_fastp/tb -n tb_multiqc_trimmed_fastp.html -o ${OUTPUT_DIR}/qc_trim_fastp/tb
+multiqc ${OUTPUT_DIR}/qc_trim_fastp/tb --force -n tb_multiqc_trimmed_fastp.html -o ${OUTPUT_DIR}/qc_trim_fastp/tb
 
 # VC
 echo "1) FastQC + MultiQC on raw reads / VC ..."
 fastqc -t ${THREADS} -o ${OUTPUT_DIR}/qc_raw/vc ${VC_RAW}/*_1.fastq.gz ${VC_RAW}/*_2.fastq.gz
-multiqc ${OUTPUT_DIR}/qc_raw/vc -n vc_multiqc_raw.html -o ${OUTPUT_DIR}/qc_raw/vc
+multiqc ${OUTPUT_DIR}/qc_raw/vc --force -n vc_multiqc_raw.html -o ${OUTPUT_DIR}/qc_raw/vc
 
 echo "2) Cleaning with trimmomatic / VC ..."
 # VC (MINLEN 50)
@@ -86,7 +86,7 @@ done
 
 echo "3) QC after cleaning with Trimmomatic / VC ..."
 fastqc -t ${THREADS} -o ${OUTPUT_DIR}/qc_trim_trimmomatic/vc ${OUTPUT_DIR}/trimmed_trimmomatic/vc/*_1.fastq.gz ${OUTPUT_DIR}/trimmed_trimmomatic/vc/*_2.fastq.gz
-multiqc ${OUTPUT_DIR}/qc_trim_trimmomatic/vc -n vc_multiqc_trimmed_trimmomatic.html -o ${OUTPUT_DIR}/qc_trim_trimmomatic/vc
+multiqc ${OUTPUT_DIR}/qc_trim_trimmomatic/vc --force -n vc_multiqc_trimmed_trimmomatic.html -o ${OUTPUT_DIR}/qc_trim_trimmomatic/vc
 
 echo "4) Cleaning with Fastp / VC ..."
 # VC (length_required 50) + polyG/polyX trimming
@@ -103,7 +103,7 @@ done
 
 echo "5) QC after cleaning with Fastp / VC ..."
 fastqc -t ${THREADS} -o ${OUTPUT_DIR}/qc_trim_fastp/vc ${OUTPUT_DIR}/trimmed_fastp/vc/*_1.fastq.gz ${OUTPUT_DIR}/trimmed_fastp/vc/*_2.fastq.gz
-multiqc ${OUTPUT_DIR}/qc_trim_fastp/vc -n vc_multiqc_trimmed_fastp.html -o ${OUTPUT_DIR}/qc_trim_fastp/vc
+multiqc ${OUTPUT_DIR}/qc_trim_fastp/vc --force -n vc_multiqc_trimmed_fastp.html -o ${OUTPUT_DIR}/qc_trim_fastp/vc
 
 # you can remove unpaired reads to save space:
 rm ${OUTPUT_DIR}/trimmed_trimmomatic/*/*U*
