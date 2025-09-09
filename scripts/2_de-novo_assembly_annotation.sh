@@ -74,7 +74,7 @@ echo "3) Genome annotation / VC ..."
 for SAMPLE in $(cat $OUTPUT_DIR/vc_IDs); do
   prokka --outdir ${OUTPUT_DIR}/annotation/vc/${SAMPLE} \
          --prefix ${SAMPLE} \
-         --cpus ${THREADS} --genus Mycobacterium --species tuberculosis \
+         --cpus ${THREADS} --genus Vibrio --species cholerae \
          --kingdom Bacteria ${OUTPUT_DIR}/assembly/vc/${SAMPLE}/contigs.fasta
 done
 conda deactivate
