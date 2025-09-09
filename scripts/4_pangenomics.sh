@@ -31,8 +31,11 @@ panaroo -i ${INPUT_DIR}/*.gff -o ${OUTPUT_DIR} \
 cd $OUTPUT_DIR
 # filtering gene presence/absence file
 panaroo-filter-pa -i ./gene_presence_absence.csv -o . --type pseudo,length
-# phylogenetic tree construction
+# phylogenetics 
 mkdir -p ${OUTPUT_DIR}/phylogenetics; cd ${OUTPUT_DIR}/phylogenetics
+# Recombination marking
+run_gubbins.py ${OUTPUT_DIR}/core_gene_alignment_filtered.aln
+# building phylogenetic tree
 iqtree2 -s ${OUTPUT_DIR}/core_gene_alignment.aln --prefix vc_core_tree -m GTR -T AUTO
 #find all the paths that run through one particular gene in the graph up to 10 genes extension.
 cd $OUTPUT_DIR
