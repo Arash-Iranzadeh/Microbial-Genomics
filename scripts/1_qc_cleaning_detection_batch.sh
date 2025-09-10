@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 #SBATCH --job-name="QC_Cleaning_Detection"
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=128GB
