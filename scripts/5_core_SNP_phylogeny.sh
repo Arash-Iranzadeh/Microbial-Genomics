@@ -24,9 +24,13 @@ bash tb_core_snp_running.sh
 #remove all the "weird" characters and replace them with N, useful for tree-building or recombination-removal tool
 
 snippy-clean_full_aln core.full.aln > clean.full.aln
-run_gubbins.py -p gubbins clean.full.aln
+
+conda activate gubbins
+run_gubbins.py -p gubbins -c ${THREADS} clean.full.aln
+
+conda activate snippy
 snp-sites -c gubbins.filtered_polymorphic_sites.fasta > clean.core.aln
-FastTree -gtr -nt clean.core.aln > clean.core.tree
+fasttree -gtr -nt clean.core.aln > clean.core.tree
 
 
 
