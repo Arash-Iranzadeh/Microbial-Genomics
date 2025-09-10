@@ -1,14 +1,4 @@
 #!/usr/bin/env bash
-# On personal computer
-conda create -n panaroo python=3.9
-conda activate panaroo
-conda install -n panaroo -c bioconda -c conda-forge panaroo
-# on cluster
-module spider conda ==>  anaconda3/2024.10
-module load anaconda3/2024.10
-conda activate 
-conda create -n panaroo -c bioconda -c conda-forge panaroo
-
 # copy the gff files resulted from annotation into the INPUT_DIR/gff_vc
 INPUT_DIR="/data/users/user28/data_analysis"
 OUTPUT_DIR="/data/users/${USER}/data_analysis"
@@ -57,3 +47,12 @@ run_gubbins.py core_gene_alignment_filtered.aln \
  
 
  
+# On personal computer
+conda create -n panaroo python=3.9
+conda activate panaroo
+conda install -n panaroo -c bioconda -c conda-forge panaroo
+# on cluster
+module spider conda ==>  anaconda3/2024.10
+module load anaconda3/2024.10
+conda activate 
+conda create -n panaroo -c bioconda -c conda-forge panaroo
