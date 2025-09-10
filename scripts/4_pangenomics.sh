@@ -7,6 +7,7 @@ mkdir -p ${OUTPUT_DIR}/pangenome_vc ${OUTPUT_DIR}/pangenome_vc/QC
 # running panaroo for annotation qc and pangenome construction
 # we need this file in INPUT_DIR, wget https://gembox.cbcb.umd.edu/mash/refseq.genomes.k21s1000.msh
 module load panaroo/1.5.0
+# https://github.com/gtonkinhill/panaroo
 # quality checks on the input annotation files
 panaroo-qc -t $(nproc) --graph_type all -i ${INPUT_DIR}/gff_vc/*.gff \
  --ref_db ${INPUT_DIR}/refseq.genomes.k21s1000.msh -o ${OUTPUT_DIR}/pangenome_vc/QC
@@ -29,6 +30,7 @@ cd ${OUTPUT_DIR}
 # phylogenetics 
 module load  anaconda3/2024.10
 conda activate gubbins
+# https://github.com/nickjcroucher/gubbins
 mkdir -p ${OUTPUT_DIR}/phylogeny
 
 cp ${OUTPUT_DIR}/pangenome_vc/core_gene_alignment_filtered.aln ${OUTPUT_DIR}/phylogeny/
@@ -38,7 +40,8 @@ run_gubbins.py core_gene_alignment_filtered.aln \
  -p gubbins -c $(nproc) -t veryfasttree
 # to undestand the output file: https://github.com/nickjcroucher/gubbins/blob/master/docs/gubbins_manual.md
 
-# tree visualization, download  gubbins.final_tree.tre and visualize it on itol\
+# tree visualization, download  gubbins.final_tree.tre and visualize it on itol:
+# https://itol.embl.de/
 
 
 
