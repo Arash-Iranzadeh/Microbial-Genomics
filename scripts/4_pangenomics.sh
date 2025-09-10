@@ -9,47 +9,46 @@ module load anaconda3/2024.10
 conda activate 
 conda create -n panaroo -c bioconda -c conda-forge panaroo
 
-# copy the gff files resulted from annotation into the INPUT_DIR
-INPUT_DIR="/data/users/${USER}/data_analysis/vc_pangenome/gff"
-OUTPUT_DIR="/data/users/${USER}/data_analysis/vc_pangenome"
-mkdir -p ${INPUT_DIR}  ${OUTPUT_DIR}/QC
+# copy the gff files resulted from annotation into the INPUT_DIR/gff_vc
+INPUT_DIR="/data/users/user28/data_analysis"
+OUTPUT_DIR="/data/users/${USER}/data_analysis"
+mkdir -p ${OUTPUT_DIR}/pangenome_vc ${OUTPUT_DIR}/pangenome_vc/QC
 
+# running panaroo for annotation qc and pangenome construction
+# we need this file in INPUT_DIR, wget https://gembox.cbcb.umd.edu/mash/refseq.genomes.k21s1000.msh
 module load panaroo/1.5.0
-
-# performing some rudimentary quality checks on the input data prior to running Panaroo using mash datbase
-wget https://gembox.cbcb.umd.edu/mash/refseq.genomes.k21s1000.msh
-panaroo-qc -t $(nproc) --graph_type all -i ${INPUT_DIR}/*.gff \
- --ref_db refseq.genomes.k21s1000.msh -o ${OUTPUT_DIR}/QC
+# quality checks on the input annotation files
+panaroo-qc -t $(nproc) --graph_type all -i ${INPUT_DIR}/gff_vc/*.gff \
+ --ref_db ${INPUT_DIR}/refseq.genomes.k21s1000.msh -o ${OUTPUT_DIR}/pangenome_vc/QC
+rm ${OUTPUT_DIR}/pangenome_vc/QC/tmp*
 # running panaroo and creating a pangenome
-
-panaroo -i ${INPUT_DIR}/*.gff -o ${OUTPUT_DIR} \
+panaroo -i ${INPUT_DIR}/gff_vc/*.gff -o ${OUTPUT_DIR}/pangenome_vc \
 --clean-mode strict -a core -a pan --core_threshold 1 --quiet -t $(nproc)
-
 # to understand outputs: https://gthlab.au/panaroo/#/gettingstarted/output
+cat $OUTPUT_DIR/pangenome_vc/summary_statistics.txt
 
-# post-processing
-cd $OUTPUT_DIR
 # filtering gene presence/absence file
-panaroo-filter-pa -i ./gene_presence_absence.csv -o . --type pseudo,length
+cd ${OUTPUT_DIR}/pangenome_vc
+panaroo-filter-pa -i gene_presence_absence.csv \
+ -o . --type pseudo,length
+# checking gene neighborhood 
+panaroo-gene-neighbourhood --gene trkI \
+ --graph final_graph.gml --expand_no 10 --out trkI_neighbourhood.txt
+cd ${OUTPUT_DIR}
+
 # phylogenetics 
-mkdir -p ${OUTPUT_DIR}/phylogenetics; cd ${OUTPUT_DIR}/phylogenetics
-# Recombination marking
-run_gubbins.py ${OUTPUT_DIR}/core_gene_alignment_filtered.aln
-# building phylogenetic tree
-iqtree2 -s ${OUTPUT_DIR}/core_gene_alignment.aln --prefix vc_core_tree -m GTR -T AUTO
-#find all the paths that run through one particular gene in the graph up to 10 genes extension.
-cd $OUTPUT_DIR
-panaroo-gene-neighbourhood --gene trkI --graph final_graph.gml --expand_no 10 --out neighbourhood.txt
+module load  anaconda3/2024.10
+conda activate gubbins
+mkdir -p ${OUTPUT_DIR}/phylogeny
 
+cp ${OUTPUT_DIR}/pangenome_vc/core_gene_alignment_filtered.aln ${OUTPUT_DIR}/phylogeny/
+cd ${OUTPUT_DIR}/phylogeny
+# constructing recombination free phylogenetic tree
+run_gubbins.py core_gene_alignment_filtered.aln \
+ -p gubbins -c $(nproc) -t veryfasttree
+# to undestand the output file: https://github.com/nickjcroucher/gubbins/blob/master/docs/gubbins_manual.md
 
-# on ilifu
-# module load  anaconda3/2024.10
-# conda create -n pyseer -c bioconda -c conda-forge pyseer
-# conda activate pyseer
-# inside pyseer env: conda install fsm-lite; conda install seer; conda install unitig-counter unitig-caller
-
-#GWAS
-cd ${OUTPUT_DIR}; mkdir -p GWAS; cd GWAS
+# tree visualization, download  gubbins.final_tree.tre and visualize it on itol\
 
 
 
