@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # copy the gff files resulted from annotation into the INPUT_DIR/gff_vc
-INPUT_DIR="/data/users/user28/data_analysis"
+INPUT_DIR="/data/users/${USER}/data_analysis"
 OUTPUT_DIR="/data/users/${USER}/data_analysis"
 mkdir -p ${OUTPUT_DIR}/pangenome_vc ${OUTPUT_DIR}/pangenome_vc/QC
 
