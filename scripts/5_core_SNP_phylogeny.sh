@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-INPUT_DIR="/data/users/user28/data_analysis"
+INPUT_DIR="/data/users/${USER}/data_analysis"
 OUTPUT_DIR="/data/users/${USER}/data_analysis"
 # TB REF: https://www.ncbi.nlm.nih.gov/nuccore/NC_000962.3?report=fasta
 REF="${INPUT_DIR}/TB_H37Rv.fasta"
