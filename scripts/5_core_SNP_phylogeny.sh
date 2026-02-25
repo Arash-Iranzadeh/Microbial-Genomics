@@ -53,7 +53,15 @@ conda activate snippy
 snp-sites -c gubbins.filtered_polymorphic_sites.fasta > clean.core.aln
 fasttree -gtr -nt clean.core.aln > clean.core.tree
 
+# another tool suitable for phylogeny is iqtree2:
+# read README.md for more info
 
-
+iqtree2 -s core.aln \
+        -m MFP+ASC \
+        -B 1000 \
+        -alrt 1000 \
+        -T AUTO \
+        --ntmax 32 \
+        --prefix "$PREFIX"
 
 
