@@ -1,4 +1,4 @@
-🌳 Phylogenetic Reconstruction (Read this fore step 5)
+🌳 Phylogenetic Reconstruction (Read this before running 5_core_SNP_phylogeny.sh)
 
 This project utilizes a high-resolution Maximum Likelihood (ML) approach to reconstruct the phylogeny of the isolates. To ensure the evolutionary signal is not distorted by recombination, we perform recombination filtering before tree building.
 🧬 Workflow Summary
